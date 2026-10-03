@@ -24,14 +24,20 @@ import {
   Upload,
   Printer,
   Loader2,
+  X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface MenuItem {
   name: string;
   path: string;
   icon: React.ReactNode;
   roles?: string[];
+}
+
+interface SidebarProps {
+  mobileSidebarOpen: boolean;
+  onMobileSidebarClose: () => void;
 }
 
 const menuItems: MenuItem[] = [
@@ -155,7 +161,7 @@ const menuItems: MenuItem[] = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ mobileSidebarOpen, onMobileSidebarClose }: SidebarProps) {
   const pathname = usePathname();
   const { user } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
@@ -170,6 +176,23 @@ export default function Sidebar() {
   };
 
   const visibleItems = menuItems.filter(hasAccess);
+
+  // Handle escape key press for mobile sidebar
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && mobileSidebarOpen) {
+        onMobileSidebarClose();
+      }
+    };
+
+    if (mobileSidebarOpen) {
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [mobileSidebarOpen, onMobileSidebarClose]);
 
   return (
     <>
@@ -251,9 +274,83 @@ export default function Sidebar() {
         </div>
       </aside>
 
-      {/* Mobile Sidebar - Slide-in Drawer */}
+      {/* Mobile Sidebar */}
       <div className="md:hidden">
-        {/* Mobile menu button handled in Navbar */}
+        {/* Backdrop */}
+        {mobileSidebarOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+            onClick={onMobileSidebarClose}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Mobile Drawer */}
+        <aside
+          className={`fixed inset-y-0 left-0 z-50 w-80 bg-surface border-r border-border transform transition-transform duration-300 ease-in-out ${
+            mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          {/* Mobile header with close button */}
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <span className="text-xl font-bold text-primary">ExamGuard</span>
+            <button
+              onClick={onMobileSidebarClose}
+              className="flex items-center justify-center w-11 h-11 rounded-lg hover:bg-primary-light text-text-muted hover:text-primary transition-colors"
+              aria-label="Close mobile menu"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Mobile navigation */}
+          <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+            {visibleItems.map((item) => {
+              const active = isActive(item.path);
+              return (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  onClick={onMobileSidebarClose}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors min-h-[44px] ${
+                    active
+                      ? 'bg-primary-light text-primary font-medium'
+                      : 'text-text-muted hover:bg-primary-light hover:text-primary'
+                  }`}
+                >
+                  {item.icon}
+                  <span className="text-sm">{item.name}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Mobile user profile section */}
+          <div className="p-4 border-t border-border">
+            <div className="space-y-3">
+              <HelpButton 
+                content="Get help and start tutorials"
+                className="w-full justify-start gap-2 text-text-muted hover:text-primary hover:bg-primary-light min-h-[44px]"
+              />
+              {user && (
+                <div className="p-3 bg-bg rounded-lg">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center text-primary font-medium">
+                      {user.full_name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-text truncate">{user.full_name}</p>
+                      <p className="text-sm text-text-muted truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  <div className="inline-block px-2 py-1 bg-primary-light text-primary rounded text-xs font-medium">
+                    {user.role.replace('_', ' ')}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </aside>
       </div>
     </>
   );

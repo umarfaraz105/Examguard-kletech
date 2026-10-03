@@ -184,9 +184,9 @@ export const DataTable = <T extends Record<string, any>>({
     const endItem = Math.min(page * pageSize, totalItems);
 
     return (
-      <div className="flex items-center justify-between px-6 py-4 border-t">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 border-t">
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>Show</span>
+          <span className="hidden sm:inline">Show</span>
           <Select
             value={pageSize.toString()}
             onValueChange={(value) => handlePageSizeChange(parseInt(value))}
@@ -202,27 +202,31 @@ export const DataTable = <T extends Record<string, any>>({
               <SelectItem value="100">100</SelectItem>
             </SelectContent>
           </Select>
-          <span>per page</span>
+          <span className="hidden sm:inline">per page</span>
         </div>
 
-        <div className="text-sm text-gray-600">
-          Showing {startItem} to {endItem} of {totalItems} results
+        <div className="text-sm text-gray-600 text-center sm:text-left">
+          <span className="hidden sm:inline">Showing </span>
+          {startItem}-{endItem} of {totalItems}
+          <span className="sm:hidden"> items</span>
+          <span className="hidden sm:inline"> results</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-1 sm:gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => handlePageChange(page - 1)}
             disabled={page <= 1}
+            className="min-h-[44px] sm:min-h-auto"
           >
             <ChevronLeft className="h-4 w-4" />
-            Previous
+            <span className="hidden sm:inline ml-1">Previous</span>
           </Button>
           
           <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const pageNum = Math.max(1, Math.min(totalPages - 4, page - 2)) + i;
+            {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
+              const pageNum = Math.max(1, Math.min(totalPages - 2, page - 1)) + i;
               if (pageNum > totalPages) return null;
               
               return (
@@ -230,7 +234,7 @@ export const DataTable = <T extends Record<string, any>>({
                   key={pageNum}
                   variant={page === pageNum ? "default" : "outline"}
                   size="sm"
-                  className="w-10"
+                  className="w-10 min-h-[44px] sm:min-h-auto"
                   onClick={() => handlePageChange(pageNum)}
                 >
                   {pageNum}
@@ -244,8 +248,9 @@ export const DataTable = <T extends Record<string, any>>({
             size="sm"
             onClick={() => handlePageChange(page + 1)}
             disabled={page >= totalPages}
+            className="min-h-[44px] sm:min-h-auto"
           >
-            Next
+            <span className="hidden sm:inline mr-1">Next</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
@@ -341,8 +346,8 @@ export const DataTable = <T extends Record<string, any>>({
       )}
 
       <CardContent className="p-0">
-        <div className="overflow-auto">
-          <table className="w-full">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
                 {onSelectionChange && (
@@ -360,7 +365,7 @@ export const DataTable = <T extends Record<string, any>>({
                   <th
                     key={column.key}
                     className={cn(
-                      'px-4 py-3 text-left text-sm font-medium text-gray-900',
+                      'px-4 py-3 text-left text-sm font-medium text-gray-900 whitespace-nowrap',
                       enableSorting && column.sortable !== false && 'cursor-pointer hover:bg-gray-100'
                     )}
                     onClick={() => enableSorting && column.sortable !== false && handleSort(column.key)}
@@ -384,7 +389,7 @@ export const DataTable = <T extends Record<string, any>>({
                 ))}
                 
                 {actions && actions.length > 0 && (
-                  <th className="w-12 px-4 py-3">Actions</th>
+                  <th className="w-12 px-4 py-3 whitespace-nowrap">Actions</th>
                 )}
               </tr>
             </thead>
@@ -423,13 +428,13 @@ export const DataTable = <T extends Record<string, any>>({
                     )}
                     
                     {columns.map((column) => (
-                      <td key={column.key} className="px-4 py-3 text-sm text-gray-900">
+                      <td key={column.key} className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                         {renderCell(column, row[column.key], row)}
                       </td>
                     ))}
                     
                     {actions && actions.length > 0 && (
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm">

@@ -294,6 +294,39 @@
     @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   }
 
+  /* Mobile-first responsive utilities */
+  .mobile-stack {
+    @apply grid-cols-1 sm:grid-cols-2;
+  }
+  
+  .mobile-stack-3 {
+    @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+  }
+  
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  .mobile-scroll {
+    @apply overflow-x-auto;
+  }
+  
+  .mobile-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  .mobile-text {
+    @apply text-sm sm:text-base;
+  }
+  
+  .mobile-hidden {
+    @apply hidden sm:block;
+  }
+  
+  .mobile-only {
+    @apply block sm:hidden;
+  }
+
   /* Tour Highlight */
   .tour-highlight {
     outline: 3px solid hsl(var(--primary));
