@@ -1,0 +1,441 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Enhanced KLE color system with full palette */
+    --primary-50: 253 236 239;    /* #FDECEF */
+    --primary-100: 250 217 223;   /* #FAD9DF */
+    --primary-200: 245 179 191;   /* #F5B3BF */
+    --primary-300: 240 141 159;   /* #F08D9F */
+    --primary-400: 229 103 127;   /* #E5677F */
+    --primary-500: 200 16 46;     /* #C8102E - Main KLE Red */
+    --primary-600: 155 12 35;     /* #9B0C23 */
+    --primary-700: 110 8 24;      /* #6E0818 */
+    --primary-800: 65 5 14;       /* #41050E */
+    --primary-900: 20 2 3;        /* #140203 */
+    
+    /* Semantic colors */
+    --success-50: 236 253 245;    /* #ECFDF5 */
+    --success-100: 209 250 229;   /* #D1FAE5 */
+    --success-500: 16 185 129;    /* #10B981 */
+    --success-600: 5 150 105;     /* #059669 */
+    --success-700: 4 120 87;      /* #047857 */
+    
+    --warning-50: 255 251 235;    /* #FFFBEB */
+    --warning-100: 254 243 199;   /* #FEF3C7 */
+    --warning-500: 245 158 11;    /* #F59E0B */
+    --warning-600: 217 119 6;     /* #D97706 */
+    --warning-700: 180 83 9;      /* #B45309 */
+    
+    --error-50: 253 236 239;      /* #FDECEF */
+    --error-100: 250 217 223;     /* #FAD9DF */
+    --error-500: 200 16 46;       /* #C8102E - Use KLE red */
+    --error-600: 155 12 35;       /* #9B0C23 */
+    --error-700: 110 8 24;        /* #6E0818 */
+    
+    --info-50: 239 246 255;       /* #EFF6FF */
+    --info-100: 219 234 254;      /* #DBEAFE */
+    --info-500: 59 130 246;       /* #3B82F6 */
+    --info-600: 37 99 235;        /* #2563EB */
+    --info-700: 29 78 216;        /* #1D4ED8 */
+    
+    /* Neutral grays */
+    --gray-50: 249 250 251;       /* #F9FAFB */
+    --gray-100: 243 244 246;      /* #F3F4F6 */
+    --gray-200: 229 231 235;      /* #E5E7EB */
+    --gray-300: 209 213 219;      /* #D1D5DB */
+    --gray-400: 156 163 175;      /* #9CA3AF */
+    --gray-500: 107 114 128;      /* #6B7280 */
+    --gray-600: 75 85 99;         /* #4B5563 */
+    --gray-700: 55 65 81;         /* #374151 */
+    --gray-800: 31 41 55;         /* #1F2937 */
+    --gray-900: 17 24 39;         /* #111827 */
+    
+    /* Layout colors */
+    --background: var(--gray-50);
+    --foreground: var(--gray-900);
+    --muted: var(--gray-100);
+    --muted-foreground: var(--gray-500);
+    --popover: 0 0% 100%;
+    --popover-foreground: var(--gray-900);
+    --card: 0 0% 100%;
+    --card-foreground: var(--gray-900);
+    --border: var(--gray-200);
+    --input: var(--gray-200);
+    --primary: var(--primary-500);
+    --primary-foreground: 0 0% 100%;
+    --secondary: var(--gray-100);
+    --secondary-foreground: var(--gray-900);
+    --accent: var(--primary-50);
+    --accent-foreground: var(--primary-500);
+    --destructive: var(--error-500);
+    --destructive-foreground: 0 0% 100%;
+    --ring: var(--primary-500);
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Improved focus styles */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+  }
+  
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400;
+  }
+}
+
+@layer components {
+  /* KLE Container Utilities */
+  .kle-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .kle-section {
+    @apply py-8 sm:py-12 lg:py-16;
+  }
+  
+  /* Card Components */
+  .kle-card {
+    @apply bg-white border border-gray-200 rounded-lg shadow-sm;
+  }
+  
+  .kle-card-elevated {
+    @apply bg-white border border-gray-200 rounded-lg shadow-md;
+  }
+  
+  .kle-card-interactive {
+    @apply kle-card hover:shadow-md hover:border-gray-300 transition-all duration-200;
+  }
+  
+  /* Button Base Classes */
+  .kle-btn-base {
+    @apply inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 
+           focus:outline-none focus:ring-2 focus:ring-offset-2 
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
+  }
+  
+  .kle-btn-primary {
+    @apply kle-btn-base bg-primary-500 text-white hover:bg-primary-600 
+           focus:ring-primary-500 active:bg-primary-700 shadow-sm hover:shadow;
+  }
+  
+  .kle-btn-secondary {
+    @apply kle-btn-base bg-gray-100 text-gray-900 hover:bg-gray-200 
+           focus:ring-gray-500 border border-gray-300 shadow-sm;
+  }
+  
+  .kle-btn-outline {
+    @apply kle-btn-base bg-white text-primary-500 border border-primary-500 
+           hover:bg-primary-50 focus:ring-primary-500 shadow-sm;
+  }
+  
+  .kle-btn-ghost {
+    @apply kle-btn-base text-gray-700 hover:bg-gray-100 focus:ring-gray-500;
+  }
+  
+  .kle-btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+  
+  .kle-btn-md {
+    @apply px-4 py-2 text-base;
+  }
+  
+  .kle-btn-lg {
+    @apply px-6 py-3 text-lg;
+  }
+  
+  /* Form Components */
+  .kle-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 
+           placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 
+           focus:border-primary-500 disabled:bg-gray-50 disabled:text-gray-500;
+  }
+  
+  .kle-input-error {
+    @apply border-error-500 focus:ring-error-500 focus:border-error-500;
+  }
+  
+  .kle-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+  
+  .kle-select {
+    @apply kle-input appearance-none bg-no-repeat bg-right bg-center pr-10;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  }
+  
+  /* Status Badges */
+  .kle-badge-base {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border;
+  }
+  
+  .kle-badge-success {
+    @apply kle-badge-base bg-success-50 text-success-700 border-success-200;
+  }
+  
+  .kle-badge-warning {
+    @apply kle-badge-base bg-warning-50 text-warning-700 border-warning-200;
+  }
+  
+  .kle-badge-error {
+    @apply kle-badge-base bg-error-50 text-error-700 border-error-200;
+  }
+  
+  .kle-badge-info {
+    @apply kle-badge-base bg-info-50 text-info-700 border-info-200;
+  }
+  
+  .kle-badge-gray {
+    @apply kle-badge-base bg-gray-100 text-gray-700 border-gray-200;
+  }
+  
+  .kle-badge-primary {
+    @apply kle-badge-base bg-primary-50 text-primary-700 border-primary-200;
+  }
+  
+  /* Navigation Components */
+  .kle-nav-item {
+    @apply flex items-center gap-3 px-3 py-2 text-gray-700 rounded-lg 
+           hover:bg-primary-50 hover:text-primary-500 transition-colors;
+  }
+  
+  .kle-nav-item-active {
+    @apply bg-primary-50 text-primary-500 font-medium;
+  }
+  
+  .kle-navbar {
+    @apply bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40;
+  }
+  
+  /* Typography Utilities */
+  .kle-heading-1 {
+    @apply text-3xl font-bold text-gray-900 sm:text-4xl;
+  }
+  
+  .kle-heading-2 {
+    @apply text-2xl font-semibold text-gray-900 sm:text-3xl;
+  }
+  
+  .kle-heading-3 {
+    @apply text-xl font-semibold text-gray-900;
+  }
+  
+  .kle-heading-4 {
+    @apply text-lg font-medium text-gray-900;
+  }
+  
+  .kle-body {
+    @apply text-base text-gray-700 leading-relaxed;
+  }
+  
+  .kle-caption {
+    @apply text-sm text-gray-600;
+  }
+  
+  .kle-muted {
+    @apply text-sm text-gray-500;
+  }
+  
+  /* Animation Utilities */
+  .kle-transition {
+    @apply transition-all duration-200 ease-out;
+  }
+  
+  .kle-transition-slow {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  .kle-hover-lift {
+    @apply hover:transform hover:-translate-y-0.5 hover:shadow-lg;
+  }
+  
+  /* Layout Grid */
+  .kle-grid-responsive {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+  }
+  
+  .kle-grid-2 {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+  }
+  
+  .kle-grid-3 {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+  
+  /* Accessibility Utilities */
+  .kle-sr-only {
+    @apply sr-only;
+  }
+  
+  .kle-focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
+  /* Tour Highlight */
+  .tour-highlight {
+    outline: 3px solid hsl(var(--primary));
+    outline-offset: 4px;
+    border-radius: 4px;
+    z-index: 51;
+    position: relative;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .kle-no-print,
+  .no-print {
+    display: none !important;
+  }
+  
+  .kle-print-only,
+  .print-only {
+    display: block !important;
+  }
+  
+  body {
+    @apply text-black bg-white;
+    font-size: 12pt !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .kle-card {
+    @apply border border-gray-400 shadow-none;
+  }
+
+  /* Page break utilities */
+  .page-break {
+    page-break-before: always !important;
+  }
+
+  .page-break-after {
+    page-break-after: always !important;
+  }
+
+  .page-break-inside-avoid,
+  .page-break-avoid {
+    page-break-inside: avoid !important;
+  }
+
+  .no-page-break {
+    page-break-inside: avoid !important;
+  }
+
+  /* Print-specific typography */
+  h1 { font-size: 18pt !important; }
+  h2 { font-size: 16pt !important; }
+  h3 { font-size: 14pt !important; }
+  h4 { font-size: 13pt !important; }
+  h5 { font-size: 12pt !important; }
+  h6 { font-size: 11pt !important; }
+
+  /* Table styles for print */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  th, td {
+    border: 1pt solid #000 !important;
+    padding: 4pt !important;
+    text-align: left !important;
+  }
+
+  th {
+    background-color: #f0f0f0 !important;
+    font-weight: bold !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Remove shadows and modern effects */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+  }
+
+  /* Ensure proper contrast */
+  .bg-primary-50 { background-color: #f8f9fa !important; }
+  .bg-success-50 { background-color: #f8f9fa !important; }
+  .bg-warning-50 { background-color: #f8f9fa !important; }
+  .bg-error-50 { background-color: #f8f9fa !important; }
+  .bg-info-50 { background-color: #f8f9fa !important; }
+  .bg-gray-50 { background-color: #f8f9fa !important; }
+  .bg-gray-100 { background-color: #e9ecef !important; }
+
+  /* Print colors */
+  .text-primary-500 { color: #000 !important; }
+  .text-success-500 { color: #000 !important; }
+  .text-warning-500 { color: #000 !important; }
+  .text-error-500 { color: #000 !important; }
+  .text-info-500 { color: #000 !important; }
+
+  /* Signature lines */
+  .signature-line {
+    border-bottom: 1pt solid #000 !important;
+    min-height: 20pt !important;
+    margin: 10pt 0 5pt 0 !important;
+  }
+
+  /* QR codes and images */
+  img, canvas, svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Hide navigation and controls */
+  nav, .nav, .navbar, .sidebar, .menu,
+  button, input[type="button"], input[type="submit"],
+  .btn, .button, .dropdown, .modal, .tooltip {
+    display: none !important;
+  }
+
+  /* Show only print buttons if specifically marked */
+  button.print-button,
+  .print-button {
+    display: inline-block !important;
+  }
+
+  /* Ensure proper spacing */
+  .print-section {
+    margin-bottom: 15pt !important;
+  }
+
+  .print-header {
+    margin-bottom: 20pt !important;
+    padding-bottom: 10pt !important;
+    border-bottom: 1pt solid #000 !important;
+  }
+
+  .print-footer {
+    margin-top: 20pt !important;
+    padding-top: 10pt !important;
+    border-top: 1pt solid #000 !important;
+  }
+}

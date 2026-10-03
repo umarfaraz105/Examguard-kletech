@@ -1,0 +1,16 @@
+{
+  "task": 14,
+  "name": "Help System Implementation",
+  "status": "done",
+  "completedAt": "2024-12-03T15:45:00.000Z",
+  "filesChanged": [
+    "src/components/ui/popover.tsx",
+    "src/app/layout.tsx",
+    "src/components/layout/Sidebar.tsx",
+    "src/app/help/page.tsx",
+    "src/app/plans/page.tsx",
+    "src/app/seating/page.tsx",
+    "src/app/dashboard/admin/page.tsx",
+    "src/app/globals.css"
+  ]
+}
