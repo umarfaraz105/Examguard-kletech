@@ -201,14 +201,18 @@ export default function Sidebar({ mobileSidebarOpen, onMobileSidebarClose }: Sid
         className={`hidden md:flex flex-col bg-surface border-r border-border transition-all duration-300 ${
           collapsed ? 'w-16' : 'w-64'
         }`}
+        role="navigation"
+        aria-label="Main navigation"
       >
         <div className="flex items-center justify-between p-4 border-b border-border">
           {!collapsed && (
-            <span className="text-xl font-bold text-primary">ExamGuard</span>
+            <h1 className="text-xl font-bold text-primary">ExamGuard</h1>
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="p-1 rounded-lg hover:bg-primary-light text-text-muted hover:text-primary transition-colors"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-expanded={!collapsed}
           >
             {collapsed ? (
               <ChevronRight className="w-5 h-5" />
@@ -218,7 +222,7 @@ export default function Sidebar({ mobileSidebarOpen, onMobileSidebarClose }: Sid
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1" role="navigation" aria-label="Main menu">
           {visibleItems.map((item) => {
             const active = isActive(item.path);
             return (
@@ -231,6 +235,7 @@ export default function Sidebar({ mobileSidebarOpen, onMobileSidebarClose }: Sid
                     : 'text-text-muted hover:bg-primary-light hover:text-primary'
                 }`}
                 title={collapsed ? item.name : undefined}
+                aria-current={active ? 'page' : undefined}
               >
                 {item.icon}
                 {!collapsed && <span className="text-sm">{item.name}</span>}
@@ -287,13 +292,17 @@ export default function Sidebar({ mobileSidebarOpen, onMobileSidebarClose }: Sid
 
         {/* Mobile Drawer */}
         <aside
+          id="mobile-sidebar"
           className={`fixed inset-y-0 left-0 z-50 w-80 bg-surface border-r border-border transform transition-transform duration-300 ease-in-out ${
             mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
+          role="navigation"
+          aria-label="Mobile navigation"
+          aria-hidden={!mobileSidebarOpen}
         >
           {/* Mobile header with close button */}
           <div className="flex items-center justify-between p-4 border-b border-border">
-            <span className="text-xl font-bold text-primary">ExamGuard</span>
+            <h1 className="text-xl font-bold text-primary">ExamGuard</h1>
             <button
               onClick={onMobileSidebarClose}
               className="flex items-center justify-center w-11 h-11 rounded-lg hover:bg-primary-light text-text-muted hover:text-primary transition-colors"
@@ -304,7 +313,7 @@ export default function Sidebar({ mobileSidebarOpen, onMobileSidebarClose }: Sid
           </div>
 
           {/* Mobile navigation */}
-          <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+          <nav className="flex-1 overflow-y-auto p-4 space-y-1" role="navigation" aria-label="Mobile menu">
             {visibleItems.map((item) => {
               const active = isActive(item.path);
               return (
@@ -317,6 +326,7 @@ export default function Sidebar({ mobileSidebarOpen, onMobileSidebarClose }: Sid
                       ? 'bg-primary-light text-primary font-medium'
                       : 'text-text-muted hover:bg-primary-light hover:text-primary'
                   }`}
+                  aria-current={active ? 'page' : undefined}
                 >
                   {item.icon}
                   <span className="text-sm">{item.name}</span>
