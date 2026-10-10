@@ -8,6 +8,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'success' | 'warning' | 'info'
   size?: 'default' | 'sm' | 'lg' | 'xl' | 'icon'
   loading?: boolean
+  'aria-label'?: string
 }
 
 const getVariantClasses = (variant: ButtonProps['variant']) => {
@@ -27,11 +28,11 @@ const getVariantClasses = (variant: ButtonProps['variant']) => {
 
 const getSizeClasses = (size: ButtonProps['size']) => {
   const sizes = {
-    default: 'h-10 px-4 py-2 text-sm',
-    sm: 'h-9 rounded-md px-3 text-xs',
-    lg: 'h-11 rounded-lg px-8',
-    xl: 'h-12 rounded-lg px-10 text-base',
-    icon: 'h-10 w-10',
+    default: 'h-10 px-4 py-2 text-sm min-h-[44px]',
+    sm: 'h-9 rounded-md px-3 text-xs min-h-[44px]',
+    lg: 'h-11 rounded-lg px-8 min-h-[44px]',
+    xl: 'h-12 rounded-lg px-10 text-base min-h-[44px]',
+    icon: 'h-10 w-10 min-h-[44px] min-w-[44px]',
   }
   return sizes[size || 'default']
 }
@@ -45,11 +46,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     loading = false, 
     children, 
     disabled, 
+    'aria-label': ariaLabel,
     ...props 
   }, ref) => {
     const Comp = asChild ? Slot : "button"
     
     const baseClasses = "inline-flex items-center justify-center whitespace-nowrap rounded-lg font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+    
+    // Determine if this is an icon-only button (common pattern for icon size)
+    const isIconOnly = size === 'icon' || (!children && ariaLabel)
     
     return (
       <Comp
@@ -61,12 +66,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         ref={ref}
         disabled={disabled || loading}
+        aria-busy={loading ? 'true' : undefined}
+        aria-label={isIconOnly && !loading ? ariaLabel : undefined}
         {...props}
       >
         {loading ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Loading...
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+            {ariaLabel ? (
+              <span className="sr-only">Loading: {ariaLabel}</span>
+            ) : (
+              <span>Loading...</span>
+            )}
           </>
         ) : (
           children

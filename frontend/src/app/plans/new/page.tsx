@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { plansAPI } from '@/lib/api';
 import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import Input from '@/components/ui/Input';
 
 export default function NewPlanPage() {

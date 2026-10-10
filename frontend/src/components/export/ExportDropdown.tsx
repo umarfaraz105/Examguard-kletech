@@ -17,7 +17,7 @@ import {
   MoreHorizontal
 } from 'lucide-react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useExport, usePrint } from '@/lib/hooks/useExport'
 import { type ExportFormat, type ExportOptions } from '@/lib/export-utils'

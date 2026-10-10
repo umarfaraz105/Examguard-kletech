@@ -1,0 +1,7 @@
+{
+  "task_id": "task16-accessibility",
+  "task_description": "Implement WCAG 2.1 Level AA accessibility improvements for ExamGuard frontend",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004", "FEAT-005"],
+  "blocked_reason": null
+}

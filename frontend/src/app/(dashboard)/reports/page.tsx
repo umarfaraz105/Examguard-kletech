@@ -18,7 +18,7 @@ import {
   Printer,
   ArrowRight
 } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/Card'
 
 const reportCategories = [

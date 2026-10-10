@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { HelpButton } from '@/components/help/HelpSystem';
 import { Users, MapPin, Calendar, Download } from 'lucide-react';
 

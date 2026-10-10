@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Bell, Check, Trash2, AlertCircle, Info, CheckCircle } from 'lucide-react';
 
 interface Notification {

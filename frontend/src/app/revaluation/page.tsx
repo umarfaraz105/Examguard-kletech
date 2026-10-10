@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import Input from '@/components/ui/Input';
 import { FileSearch, Clock, CheckCircle, XCircle, Calendar } from 'lucide-react';
 

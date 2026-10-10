@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { studentsAPI } from '@/lib/api';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 

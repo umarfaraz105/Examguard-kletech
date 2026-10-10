@@ -24,7 +24,7 @@ import {
   DialogFooter,
   DialogDescription
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import * as Progress from '@radix-ui/react-progress'
 import { cn } from '@/lib/utils'
 import { useExport } from '@/lib/hooks/useExport'

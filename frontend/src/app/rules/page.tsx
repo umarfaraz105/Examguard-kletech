@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { rulesAPI } from '@/lib/api';
 import { useRouter } from 'next/navigation';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 

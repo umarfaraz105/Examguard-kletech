@@ -1,0 +1,27 @@
+{
+  "project_type": "Next.js 14 frontend with TypeScript + Radix UI component library",
+  "language": "TypeScript",
+  "build_system": "Next.js with npm - standard React build process",
+  "test_framework": "None currently configured - manual testing required",
+  "build_command": "npm run build",
+  "test_command": "npm run type-check && npm run lint",
+  "verification_instructions": "Run build command to ensure TypeScript compilation passes. Manual testing with keyboard navigation and screen readers required for accessibility verification.",
+  "snapshot_or_generated_files": "None - Next.js generates .next build artifacts automatically",
+  "environment_constraints": "Frontend-only changes, no server restarts needed. Uses Radix UI components which provide accessibility foundation",
+  "contribution_requirements": "WCAG 2.1 Level AA compliance required per task16-accessibility-plan.md. Focus on keyboard navigation, ARIA attributes, screen reader support, and focus management",
+  "key_patterns": "Components use Radix UI primitives, custom Button/Input/Form components in ui/, hooks-based state management, className prop pattern with cn() utility",
+  "relevant_files": [
+    "frontend/src/components/layout/AppLayout.tsx",
+    "frontend/src/components/layout/Navbar.tsx", 
+    "frontend/src/components/layout/Sidebar.tsx",
+    "frontend/src/components/table/DataTable.tsx",
+    "frontend/src/components/ui/Button.tsx",
+    "frontend/src/components/ui/dialog.tsx",
+    "frontend/src/components/forms/FormField.tsx",
+    "frontend/src/components/notifications/NotificationPanel.tsx",
+    "frontend/src/components/loading/LoadingSkeletons.tsx",
+    "frontend/src/components/charts/*.tsx",
+    "frontend/task16-accessibility-plan.md"
+  ],
+  "directory_structure": "src/components/ contains ui/ (primitive components), layout/ (navigation), forms/, table/, charts/, loading/, notifications/. Each component follows React FC pattern with TypeScript props interfaces"
+}

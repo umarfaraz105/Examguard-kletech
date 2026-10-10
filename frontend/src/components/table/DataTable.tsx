@@ -191,7 +191,7 @@ export const DataTable = <T extends Record<string, any>>({
             value={pageSize.toString()}
             onValueChange={(value) => handlePageSizeChange(parseInt(value))}
           >
-            <SelectTrigger className="w-16">
+            <SelectTrigger className="w-16" aria-label="Items per page">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -205,26 +205,27 @@ export const DataTable = <T extends Record<string, any>>({
           <span className="hidden sm:inline">per page</span>
         </div>
 
-        <div className="text-sm text-gray-600 text-center sm:text-left">
+        <div className="text-sm text-gray-600 text-center sm:text-left" role="status" aria-live="polite">
           <span className="hidden sm:inline">Showing </span>
           {startItem}-{endItem} of {totalItems}
           <span className="sm:hidden"> items</span>
           <span className="hidden sm:inline"> results</span>
         </div>
 
-        <div className="flex items-center justify-center gap-1 sm:gap-2">
+        <nav className="flex items-center justify-center gap-1 sm:gap-2" role="navigation" aria-label="Table pagination">
           <Button
             variant="outline"
             size="sm"
             onClick={() => handlePageChange(page - 1)}
             disabled={page <= 1}
-            className="min-h-[44px] sm:min-h-auto"
+            className="min-h-[44px] min-w-[44px] sm:min-h-auto sm:min-w-auto"
+            aria-label="Go to previous page"
           >
             <ChevronLeft className="h-4 w-4" />
             <span className="hidden sm:inline ml-1">Previous</span>
           </Button>
           
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1" role="group" aria-label="Page numbers">
             {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
               const pageNum = Math.max(1, Math.min(totalPages - 2, page - 1)) + i;
               if (pageNum > totalPages) return null;
@@ -234,8 +235,10 @@ export const DataTable = <T extends Record<string, any>>({
                   key={pageNum}
                   variant={page === pageNum ? "default" : "outline"}
                   size="sm"
-                  className="w-10 min-h-[44px] sm:min-h-auto"
+                  className="min-w-[44px] min-h-[44px] sm:min-h-auto"
                   onClick={() => handlePageChange(pageNum)}
+                  aria-label={`Go to page ${pageNum}`}
+                  aria-current={page === pageNum ? "page" : undefined}
                 >
                   {pageNum}
                 </Button>
@@ -248,12 +251,13 @@ export const DataTable = <T extends Record<string, any>>({
             size="sm"
             onClick={() => handlePageChange(page + 1)}
             disabled={page >= totalPages}
-            className="min-h-[44px] sm:min-h-auto"
+            className="min-h-[44px] min-w-[44px] sm:min-h-auto sm:min-w-auto"
+            aria-label="Go to next page"
           >
             <span className="hidden sm:inline mr-1">Next</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
-        </div>
+        </nav>
       </div>
     );
   };
@@ -347,16 +351,24 @@ export const DataTable = <T extends Record<string, any>>({
 
       <CardContent className="p-0">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-full">
+          <table className="w-full min-w-full" role="table" aria-label={title || 'Data table'}>
+            {title && (
+              <caption className="sr-only">
+                {title}
+                {description && `: ${description}`}
+                {totalItems > 0 && `. ${totalItems} total items, showing page ${pagination.page} of ${pagination.totalPages}.`}
+              </caption>
+            )}
             <thead className="bg-gray-50 border-b">
-              <tr>
+              <tr role="row">
                 {onSelectionChange && (
-                  <th className="w-12 px-4 py-3">
+                  <th scope="col" className="w-12 px-4 py-3">
                     <input
                       type="checkbox"
                       checked={selectedRows.size === paginatedData.length && paginatedData.length > 0}
                       onChange={(e) => handleSelectAll(e.target.checked)}
                       className="rounded"
+                      aria-label="Select all rows"
                     />
                   </th>
                 )}
@@ -364,12 +376,29 @@ export const DataTable = <T extends Record<string, any>>({
                 {columns.map((column) => (
                   <th
                     key={column.key}
+                    scope="col"
                     className={cn(
                       'px-4 py-3 text-left text-sm font-medium text-gray-900 whitespace-nowrap',
                       enableSorting && column.sortable !== false && 'cursor-pointer hover:bg-gray-100'
                     )}
                     onClick={() => enableSorting && column.sortable !== false && handleSort(column.key)}
+                    onKeyDown={(e) => {
+                      if (enableSorting && column.sortable !== false && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault();
+                        handleSort(column.key);
+                      }
+                    }}
+                    tabIndex={enableSorting && column.sortable !== false ? 0 : undefined}
                     style={{ width: column.width ? `${column.width}px` : 'auto' }}
+                    aria-sort={
+                      sortConfig?.key === column.key
+                        ? sortConfig.direction === 'asc'
+                          ? 'ascending'
+                          : 'descending'
+                        : enableSorting && column.sortable !== false
+                        ? 'none'
+                        : undefined
+                    }
                   >
                     <div className="flex items-center justify-between">
                       <span>{column.header}</span>
@@ -383,13 +412,16 @@ export const DataTable = <T extends Record<string, any>>({
                         onChange={(e) => handleColumnSearch(column.key, e.target.value)}
                         className="mt-2 h-8 text-xs"
                         onClick={(e) => e.stopPropagation()}
+                        aria-label={`Search ${column.header}`}
                       />
                     )}
                   </th>
                 ))}
                 
                 {actions && actions.length > 0 && (
-                  <th className="w-12 px-4 py-3 whitespace-nowrap">Actions</th>
+                  <th scope="col" className="w-12 px-4 py-3 whitespace-nowrap">
+                    Actions
+                  </th>
                 )}
               </tr>
             </thead>
@@ -400,6 +432,7 @@ export const DataTable = <T extends Record<string, any>>({
                   <td 
                     colSpan={columns.length + (onSelectionChange ? 1 : 0) + (actions ? 1 : 0)} 
                     className="px-4 py-8 text-center text-gray-500"
+                    role="cell"
                   >
                     {emptyMessage}
                   </td>
@@ -414,30 +447,45 @@ export const DataTable = <T extends Record<string, any>>({
                       selectedRows.has(index) && 'bg-blue-50'
                     )}
                     onClick={() => onRowClick?.(row)}
+                    onKeyDown={(e) => {
+                      if (onRowClick && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault();
+                        onRowClick(row);
+                      }
+                    }}
+                    tabIndex={onRowClick ? 0 : undefined}
+                    role="row"
+                    aria-selected={selectedRows.has(index) ? 'true' : undefined}
                   >
                     {onSelectionChange && (
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3" role="cell">
                         <input
                           type="checkbox"
                           checked={selectedRows.has(index)}
                           onChange={(e) => handleRowSelect(index, e.target.checked)}
                           onClick={(e) => e.stopPropagation()}
                           className="rounded"
+                          aria-label={`Select row ${index + 1}`}
                         />
                       </td>
                     )}
                     
                     {columns.map((column) => (
-                      <td key={column.key} className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                      <td key={column.key} className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap" role="cell">
                         {renderCell(column, row[column.key], row)}
                       </td>
                     ))}
                     
                     {actions && actions.length > 0 && (
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-4 py-3 whitespace-nowrap" role="cell">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="min-h-[44px] min-w-[44px]"
+                              aria-label={`Actions for row ${index + 1}`}
+                            >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>

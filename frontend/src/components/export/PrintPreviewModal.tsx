@@ -22,7 +22,7 @@ import {
   DialogTitle,
   DialogFooter
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import * as Tabs from '@radix-ui/react-tabs'
 import { cn } from '@/lib/utils'
 import { usePrint } from '@/lib/hooks/useExport'

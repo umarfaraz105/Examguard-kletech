@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { plansAPI } from '@/lib/api';
 import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { HelpButton } from '@/components/help/HelpSystem';
 import Link from 'next/link';
 
