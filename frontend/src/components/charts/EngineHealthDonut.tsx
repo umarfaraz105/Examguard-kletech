@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { CHART_COLORS } from '@/lib/analytics';
 import ChartWrapper from './ChartWrapper';
+import ChartDataTable, { generateChartInsights } from './ChartDataTable';
 
 interface DonutChartData {
   name: string;
@@ -37,6 +38,29 @@ export default function EngineHealthDonut({
   const total = data.reduce((sum, item) => sum + item.value, 0);
   const successRate = data.find(d => d.name === 'Success')?.value || 0;
   const healthPercentage = total > 0 ? ((successRate / total) * 100).toFixed(1) : '0';
+
+  // Generate accessibility data
+  const dataTableColumns = [
+    { key: 'name', label: 'Status', format: (value: string) => value },
+    { key: 'value', label: 'Count', format: (value: number) => value.toLocaleString() },
+    { 
+      key: 'percentage', 
+      label: 'Percentage', 
+      format: (value: number) => `${value.toFixed(1)}%` 
+    }
+  ];
+
+  const tableData = data.map(item => ({
+    ...item,
+    percentage: total > 0 ? (item.value / total) * 100 : 0
+  }));
+
+  const chartInsights = generateChartInsights(data, 'donut', {
+    valueField: 'value',
+    labelField: 'name'
+  });
+
+  const dataDescription = `Donut chart displaying engine health status with ${total.toLocaleString()} total executions. The center shows the overall success rate of ${healthPercentage}%. Different colored segments use distinct patterns to represent success and failure rates.`;
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -90,9 +114,21 @@ export default function EngineHealthDonut({
       error={error}
       onRetry={onRetry}
       exportable
+      chartType="donut"
+      dataDescription={dataDescription}
+      chartData={tableData}
+      dataTableComponent={
+        <ChartDataTable
+          data={tableData}
+          columns={dataTableColumns}
+          caption="Engine health status showing success and failure counts with percentages"
+          sortable
+        />
+      }
+      keyInsights={chartInsights}
     >
       <ResponsiveContainer width="100%" height={height}>
-        <PieChart>
+        <PieChart role="img" aria-label="Donut chart showing engine health status">
           <Pie
             data={data}
             cx="50%"
@@ -102,9 +138,18 @@ export default function EngineHealthDonut({
             innerRadius={40}
             fill="#8884d8"
             dataKey="value"
+            role="img"
+            aria-label="Engine status segments"
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
+              <Cell 
+                key={`cell-${index}`} 
+                fill={entry.color}
+                stroke="#fff"
+                strokeWidth={3}
+                strokeDasharray={entry.name === 'Success' ? 'none' : '5,2'}
+                aria-label={`${entry.name}: ${entry.value} executions (${((entry.value / total) * 100).toFixed(1)}%)`}
+              />
             ))}
           </Pie>
           <Pie

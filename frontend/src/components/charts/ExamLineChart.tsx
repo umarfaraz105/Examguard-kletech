@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import { CHART_COLORS } from '@/lib/analytics';
 import ChartWrapper from './ChartWrapper';
+import ChartDataTable, { generateChartInsights } from './ChartDataTable';
 
 interface ExamLineChartData {
   month: string;
@@ -36,6 +37,22 @@ export default function ExamLineChart({
   error,
   onRetry,
 }: ExamLineChartProps) {
+  // Generate accessibility data
+  const dataTableColumns = [
+    { key: 'month', label: 'Month', format: (value: string) => value },
+    { key: 'scheduled', label: 'Scheduled', format: (value: number) => value.toLocaleString() },
+    { key: 'completed', label: 'Completed', format: (value: number) => value.toLocaleString() },
+    { key: 'ongoing', label: 'Ongoing', format: (value: number) => value.toLocaleString() }
+  ];
+
+  const chartInsights = generateChartInsights(data, 'line', {
+    valueField: 'scheduled',
+    labelField: 'month',
+    timeField: 'month'
+  });
+
+  const dataDescription = `Line chart showing exam statistics over ${data.length} time periods. Tracks scheduled exams (blue line), completed exams (green line), and ongoing exams (light blue line). Lines use both color and different patterns to distinguish data series.`;
+
   return (
     <ChartWrapper
       title="Exam Statistics Over Time"
@@ -44,18 +61,37 @@ export default function ExamLineChart({
       error={error}
       onRetry={onRetry}
       exportable
+      chartType="line"
+      dataDescription={dataDescription}
+      chartData={data}
+      dataTableComponent={
+        <ChartDataTable
+          data={data}
+          columns={dataTableColumns}
+          caption="Exam statistics over time showing scheduled, completed, and ongoing exams by month"
+          sortable
+        />
+      }
+      keyInsights={chartInsights}
     >
       <ResponsiveContainer width="100%" height={height}>
-        <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <LineChart 
+          data={data} 
+          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          role="img"
+          aria-label="Line chart showing exam statistics trends over time"
+        >
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           <XAxis 
             dataKey="month" 
             stroke="#6b7280"
             fontSize={12}
+            aria-label="Time period (months)"
           />
           <YAxis 
             stroke="#6b7280"
             fontSize={12}
+            aria-label="Number of exams"
           />
           <Tooltip 
             contentStyle={{
@@ -69,28 +105,34 @@ export default function ExamLineChart({
             type="monotone"
             dataKey="scheduled"
             stroke={CHART_COLORS.primary}
-            strokeWidth={2}
-            dot={{ fill: CHART_COLORS.primary, strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6, stroke: CHART_COLORS.primary }}
+            strokeWidth={3}
+            strokeDasharray="none"
+            dot={{ fill: CHART_COLORS.primary, strokeWidth: 2, r: 5 }}
+            activeDot={{ r: 7, stroke: CHART_COLORS.primary }}
             name="Scheduled"
+            aria-label="Scheduled exams trend line"
           />
           <Line
             type="monotone"
             dataKey="completed"
             stroke={CHART_COLORS.success}
-            strokeWidth={2}
-            dot={{ fill: CHART_COLORS.success, strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6, stroke: CHART_COLORS.success }}
+            strokeWidth={3}
+            strokeDasharray="5,5"
+            dot={{ fill: CHART_COLORS.success, strokeWidth: 2, r: 5 }}
+            activeDot={{ r: 7, stroke: CHART_COLORS.success }}
             name="Completed"
+            aria-label="Completed exams trend line"
           />
           <Line
             type="monotone"
             dataKey="ongoing"
             stroke={CHART_COLORS.info}
-            strokeWidth={2}
-            dot={{ fill: CHART_COLORS.info, strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6, stroke: CHART_COLORS.info }}
+            strokeWidth={3}
+            strokeDasharray="10,3"
+            dot={{ fill: CHART_COLORS.info, strokeWidth: 2, r: 5 }}
+            activeDot={{ r: 7, stroke: CHART_COLORS.info }}
             name="Ongoing"
+            aria-label="Ongoing exams trend line"
           />
         </LineChart>
       </ResponsiveContainer>

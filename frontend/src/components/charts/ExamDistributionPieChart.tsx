@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import { CHART_COLORS, CHART_COLOR_ARRAY } from '@/lib/analytics';
 import ChartWrapper from './ChartWrapper';
+import ChartDataTable, { generateChartInsights } from './ChartDataTable';
 
 interface PieChartData {
   name: string;
@@ -36,6 +37,29 @@ export default function ExamDistributionPieChart({
   // Calculate percentages
   const total = data.reduce((sum, item) => sum + item.value, 0);
   
+  // Generate accessibility data
+  const dataTableColumns = [
+    { key: 'name', label: 'Category', format: (value: string) => value },
+    { key: 'value', label: 'Count', format: (value: number) => value.toLocaleString() },
+    { 
+      key: 'percentage', 
+      label: 'Percentage', 
+      format: (value: number) => `${value.toFixed(1)}%` 
+    }
+  ];
+
+  const tableData = data.map(item => ({
+    ...item,
+    percentage: total > 0 ? (item.value / total) * 100 : 0
+  }));
+
+  const chartInsights = generateChartInsights(data, 'pie', {
+    valueField: 'value',
+    labelField: 'name'
+  });
+
+  const dataDescription = `Pie chart showing the distribution of ${total.toLocaleString()} exams across ${data.length} categories. Each segment uses distinct colors and patterns, with percentages labeled for segments over 5% of the total.`;
+
   const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -87,9 +111,21 @@ export default function ExamDistributionPieChart({
       error={error}
       onRetry={onRetry}
       exportable
+      chartType="pie"
+      dataDescription={dataDescription}
+      chartData={tableData}
+      dataTableComponent={
+        <ChartDataTable
+          data={tableData}
+          columns={dataTableColumns}
+          caption="Exam distribution data showing counts and percentages by category"
+          sortable
+        />
+      }
+      keyInsights={chartInsights}
     >
       <ResponsiveContainer width="100%" height={height}>
-        <PieChart>
+        <PieChart role="img" aria-label="Pie chart showing exam distribution by category">
           <Pie
             data={data}
             cx="50%"
@@ -99,11 +135,16 @@ export default function ExamDistributionPieChart({
             outerRadius={80}
             fill="#8884d8"
             dataKey="value"
+            role="img"
+            aria-label="Pie chart segments"
           >
             {data.map((entry, index) => (
               <Cell 
                 key={`cell-${index}`} 
                 fill={entry.color || CHART_COLOR_ARRAY[index % CHART_COLOR_ARRAY.length]} 
+                stroke="#fff"
+                strokeWidth={2}
+                aria-label={`${entry.name}: ${entry.value} exams (${((entry.value / total) * 100).toFixed(1)}%)`}
               />
             ))}
           </Pie>
