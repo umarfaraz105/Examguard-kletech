@@ -1,5 +1,5 @@
 /**
- * Reusable form field components with validation
+ * Reusable form field components with validation and accessibility
  */
 import React from 'react';
 import { UseFormRegisterReturn, FieldError } from 'react-hook-form';
@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 // ============================================================================
-// Base Form Field Component
+// Base Form Field Component with Accessibility
 // ============================================================================
 
 interface BaseFieldProps {
@@ -30,27 +30,43 @@ function FieldWrapper({
   required, 
   children, 
   className,
-  help 
-}: BaseFieldProps & { children: React.ReactNode }) {
+  help,
+  fieldId 
+}: BaseFieldProps & { 
+  children: React.ReactNode;
+  fieldId: string;
+}) {
   const errorMessage = typeof error === 'string' ? error : error?.message;
+  const helpId = help ? `${fieldId}-help` : undefined;
+  const errorId = errorMessage ? `${fieldId}-error` : undefined;
+  const describedBy = [helpId, errorId].filter(Boolean).join(' ') || undefined;
   
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
-        <Label className={cn(
-          'text-sm font-medium text-gray-700',
-          required && "after:content-['*'] after:ml-0.5 after:text-red-500"
-        )}>
+        <Label 
+          htmlFor={fieldId}
+          className={cn(
+            'text-sm font-medium text-gray-700',
+            required && "after:content-['*'] after:ml-0.5 after:text-red-500"
+          )}
+        >
           {label}
+          {required && <span className="sr-only"> (required)</span>}
         </Label>
       )}
-      {children}
+      {React.cloneElement(children as React.ReactElement, {
+        id: fieldId,
+        'aria-required': required ? 'true' : undefined,
+        'aria-invalid': errorMessage ? 'true' : 'false',
+        'aria-describedby': describedBy,
+      })}
       {help && !errorMessage && (
-        <p className="text-xs text-gray-500">{help}</p>
+        <p id={helpId} className="text-xs text-gray-500">{help}</p>
       )}
       {errorMessage && (
-        <div className="flex items-center gap-1 text-xs text-red-600">
-          <AlertCircle className="h-3 w-3" />
+        <div id={errorId} className="flex items-center gap-1 text-xs text-red-600" role="alert">
+          <AlertCircle className="h-3 w-3" aria-hidden="true" />
           <span>{errorMessage}</span>
         </div>
       )}
@@ -59,7 +75,7 @@ function FieldWrapper({
 }
 
 // ============================================================================
-// Text Input Field
+// Text Input Field with Accessibility
 // ============================================================================
 
 interface TextFieldProps extends BaseFieldProps {
@@ -67,6 +83,7 @@ interface TextFieldProps extends BaseFieldProps {
   type?: 'text' | 'email' | 'tel' | 'url' | 'search';
   placeholder?: string;
   autoComplete?: string;
+  id?: string;
 }
 
 export function TextField({ 
@@ -79,8 +96,11 @@ export function TextField({
   placeholder,
   autoComplete,
   className,
-  help 
+  help,
+  id
 }: TextFieldProps) {
+  const generatedId = React.useId();
+  const fieldId = id || `field-${generatedId}`;
   const errorMessage = typeof error === 'string' ? error : error?.message;
   
   return (
@@ -90,6 +110,7 @@ export function TextField({
       required={required} 
       className={className}
       help={help}
+      fieldId={fieldId}
     >
       <Input
         {...register}
@@ -106,7 +127,7 @@ export function TextField({
 }
 
 // ============================================================================
-// Password Input Field
+// Password Input Field with Accessibility
 // ============================================================================
 
 interface PasswordFieldProps extends BaseFieldProps {
@@ -114,6 +135,7 @@ interface PasswordFieldProps extends BaseFieldProps {
   placeholder?: string;
   autoComplete?: string;
   showToggle?: boolean;
+  id?: string;
 }
 
 export function PasswordField({ 
@@ -126,9 +148,13 @@ export function PasswordField({
   autoComplete = 'current-password',
   showToggle = true,
   className,
-  help 
+  help,
+  id 
 }: PasswordFieldProps) {
   const [showPassword, setShowPassword] = React.useState(false);
+  const generatedId = React.useId();
+  const fieldId = id || `field-${generatedId}`;
+  const toggleId = `${fieldId}-toggle`;
   const errorMessage = typeof error === 'string' ? error : error?.message;
   
   return (
@@ -138,6 +164,7 @@ export function PasswordField({
       required={required} 
       className={className}
       help={help}
+      fieldId={fieldId}
     >
       <div className="relative">
         <Input
@@ -153,15 +180,19 @@ export function PasswordField({
         />
         {showToggle && (
           <button
+            id={toggleId}
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded"
             disabled={disabled}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            aria-pressed={showPassword}
+            aria-controls={fieldId}
           >
             {showPassword ? (
-              <EyeOff className="h-4 w-4" />
+              <EyeOff className="h-4 w-4" aria-hidden="true" />
             ) : (
-              <Eye className="h-4 w-4" />
+              <Eye className="h-4 w-4" aria-hidden="true" />
             )}
           </button>
         )}
@@ -171,7 +202,7 @@ export function PasswordField({
 }
 
 // ============================================================================
-// Number Input Field
+// Number Input Field with Accessibility
 // ============================================================================
 
 interface NumberFieldProps extends BaseFieldProps {
@@ -180,6 +211,7 @@ interface NumberFieldProps extends BaseFieldProps {
   max?: number;
   step?: number;
   placeholder?: string;
+  id?: string;
 }
 
 export function NumberField({ 
@@ -193,8 +225,11 @@ export function NumberField({
   step,
   placeholder,
   className,
-  help 
+  help,
+  id 
 }: NumberFieldProps) {
+  const generatedId = React.useId();
+  const fieldId = id || `field-${generatedId}`;
   const errorMessage = typeof error === 'string' ? error : error?.message;
   
   return (
@@ -204,6 +239,7 @@ export function NumberField({
       required={required} 
       className={className}
       help={help}
+      fieldId={fieldId}
     >
       <Input
         {...register}
@@ -222,13 +258,14 @@ export function NumberField({
 }
 
 // ============================================================================
-// Textarea Field
+// Textarea Field with Accessibility
 // ============================================================================
 
 interface TextareaFieldProps extends BaseFieldProps {
   register: UseFormRegisterReturn;
   placeholder?: string;
   rows?: number;
+  id?: string;
 }
 
 export function TextareaField({ 
@@ -240,8 +277,11 @@ export function TextareaField({
   placeholder,
   rows = 3,
   className,
-  help 
+  help,
+  id 
 }: TextareaFieldProps) {
+  const generatedId = React.useId();
+  const fieldId = id || `field-${generatedId}`;
   const errorMessage = typeof error === 'string' ? error : error?.message;
   
   return (
@@ -251,6 +291,7 @@ export function TextareaField({
       required={required} 
       className={className}
       help={help}
+      fieldId={fieldId}
     >
       <Textarea
         {...register}
@@ -266,7 +307,7 @@ export function TextareaField({
 }
 
 // ============================================================================
-// Select Field
+// Select Field with Accessibility
 // ============================================================================
 
 interface SelectOption {
@@ -275,11 +316,14 @@ interface SelectOption {
   disabled?: boolean;
 }
 
+export type { SelectOption };
+
 interface SelectFieldProps extends BaseFieldProps {
   value?: string;
   onValueChange: (value: string) => void;
   options: SelectOption[];
   placeholder?: string;
+  id?: string;
 }
 
 export function SelectField({ 
@@ -292,8 +336,11 @@ export function SelectField({
   disabled, 
   placeholder = 'Select an option',
   className,
-  help 
+  help,
+  id 
 }: SelectFieldProps) {
+  const generatedId = React.useId();
+  const fieldId = id || `field-${generatedId}`;
   const errorMessage = typeof error === 'string' ? error : error?.message;
   
   return (
@@ -303,11 +350,19 @@ export function SelectField({
       required={required} 
       className={className}
       help={help}
+      fieldId={fieldId}
     >
-      <Select value={value} onValueChange={onValueChange} disabled={disabled}>
-        <SelectTrigger className={cn(
-          errorMessage && 'border-red-500 focus:ring-red-500 focus:border-red-500'
-        )}>
+      <Select 
+        value={value} 
+        onValueChange={onValueChange} 
+        disabled={disabled}
+      >
+        <SelectTrigger 
+          className={cn(
+            errorMessage && 'border-red-500 focus:ring-red-500 focus:border-red-500'
+          )}
+          aria-label={label || placeholder}
+        >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
@@ -327,13 +382,14 @@ export function SelectField({
 }
 
 // ============================================================================
-// Checkbox Field
+// Checkbox Field with Accessibility
 // ============================================================================
 
 interface CheckboxFieldProps extends BaseFieldProps {
   checked?: boolean;
   onCheckedChange: (checked: boolean) => void;
   children: React.ReactNode;
+  id?: string;
 }
 
 export function CheckboxField({ 
@@ -343,31 +399,45 @@ export function CheckboxField({
   error, 
   disabled, 
   className,
-  help 
+  help,
+  id 
 }: CheckboxFieldProps) {
+  const generatedId = React.useId();
+  const fieldId = id || `field-${generatedId}`;
+  const labelId = `${fieldId}-label`;
+  const helpId = help ? `${fieldId}-help` : undefined;
+  const errorId = error ? `${fieldId}-error` : undefined;
   const errorMessage = typeof error === 'string' ? error : error?.message;
+  const describedBy = [helpId, errorId].filter(Boolean).join(' ') || undefined;
   
   return (
     <div className={cn('space-y-2', className)}>
       <div className="flex items-center space-x-2">
         <Checkbox
+          id={fieldId}
           checked={checked}
           onCheckedChange={onCheckedChange}
           disabled={disabled}
+          aria-describedby={describedBy}
+          aria-invalid={errorMessage ? 'true' : 'false'}
           className={cn(
             errorMessage && 'border-red-500 focus:ring-red-500'
           )}
         />
-        <label className="text-sm font-medium text-gray-700 cursor-pointer">
+        <label 
+          id={labelId}
+          htmlFor={fieldId}
+          className="text-sm font-medium text-gray-700 cursor-pointer"
+        >
           {children}
         </label>
       </div>
       {help && !errorMessage && (
-        <p className="text-xs text-gray-500 ml-6">{help}</p>
+        <p id={helpId} className="text-xs text-gray-500 ml-6">{help}</p>
       )}
       {errorMessage && (
-        <div className="flex items-center gap-1 text-xs text-red-600 ml-6">
-          <AlertCircle className="h-3 w-3" />
+        <div id={errorId} className="flex items-center gap-1 text-xs text-red-600 ml-6" role="alert">
+          <AlertCircle className="h-3 w-3" aria-hidden="true" />
           <span>{errorMessage}</span>
         </div>
       )}
@@ -376,13 +446,14 @@ export function CheckboxField({
 }
 
 // ============================================================================
-// Date Field
+// Date Field with Accessibility
 // ============================================================================
 
 interface DateFieldProps extends BaseFieldProps {
   register: UseFormRegisterReturn;
   min?: string;
   max?: string;
+  id?: string;
 }
 
 export function DateField({ 
@@ -394,8 +465,11 @@ export function DateField({
   min,
   max,
   className,
-  help 
+  help,
+  id 
 }: DateFieldProps) {
+  const generatedId = React.useId();
+  const fieldId = id || `field-${generatedId}`;
   const errorMessage = typeof error === 'string' ? error : error?.message;
   
   return (
@@ -405,6 +479,7 @@ export function DateField({
       required={required} 
       className={className}
       help={help}
+      fieldId={fieldId}
     >
       <Input
         {...register}
@@ -421,13 +496,14 @@ export function DateField({
 }
 
 // ============================================================================
-// File Upload Field
+// File Upload Field with Accessibility
 // ============================================================================
 
 interface FileFieldProps extends BaseFieldProps {
   register: UseFormRegisterReturn;
   accept?: string;
   multiple?: boolean;
+  id?: string;
 }
 
 export function FileField({ 
@@ -439,8 +515,11 @@ export function FileField({
   accept,
   multiple,
   className,
-  help 
+  help,
+  id 
 }: FileFieldProps) {
+  const generatedId = React.useId();
+  const fieldId = id || `field-${generatedId}`;
   const errorMessage = typeof error === 'string' ? error : error?.message;
   
   return (
@@ -450,6 +529,7 @@ export function FileField({
       required={required} 
       className={className}
       help={help}
+      fieldId={fieldId}
     >
       <Input
         {...register}
@@ -463,5 +543,61 @@ export function FileField({
         )}
       />
     </FieldWrapper>
+  );
+}
+
+// ============================================================================
+// Form Group with Fieldset/Legend for Grouped Controls
+// ============================================================================
+
+interface FormGroupProps {
+  legend: string;
+  children: React.ReactNode;
+  error?: FieldError | string;
+  required?: boolean;
+  className?: string;
+  help?: string;
+}
+
+export function FormGroup({ 
+  legend, 
+  children, 
+  error, 
+  required, 
+  className,
+  help 
+}: FormGroupProps) {
+  const groupId = React.useId();
+  const errorMessage = typeof error === 'string' ? error : error?.message;
+  const helpId = help ? `${groupId}-help` : undefined;
+  const errorId = errorMessage ? `${groupId}-error` : undefined;
+  const describedBy = [helpId, errorId].filter(Boolean).join(' ') || undefined;
+  
+  return (
+    <fieldset 
+      className={cn('space-y-4 border border-gray-200 rounded-lg p-4', className)}
+      aria-describedby={describedBy}
+      aria-invalid={errorMessage ? 'true' : 'false'}
+    >
+      <legend className={cn(
+        'text-sm font-medium text-gray-900 px-2 -ml-2',
+        required && "after:content-['*'] after:ml-0.5 after:text-red-500"
+      )}>
+        {legend}
+        {required && <span className="sr-only"> (required)</span>}
+      </legend>
+      {help && !errorMessage && (
+        <p id={helpId} className="text-xs text-gray-500">{help}</p>
+      )}
+      {errorMessage && (
+        <div id={errorId} className="flex items-center gap-1 text-xs text-red-600" role="alert">
+          <AlertCircle className="h-3 w-3" aria-hidden="true" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+      <div className="space-y-3">
+        {children}
+      </div>
+    </fieldset>
   );
 }
