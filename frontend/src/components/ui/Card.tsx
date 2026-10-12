@@ -79,4 +79,8 @@ const CardFooter = React.forwardRef<
 ));
 CardFooter.displayName = 'CardFooter';
 
+// Default export for backward compatibility
+export default Card;
+
+// Named exports
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };

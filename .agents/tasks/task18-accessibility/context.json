@@ -1,0 +1,22 @@
+{
+  "project_type": "Next.js 14 + TypeScript frontend using App Router, part of ExamGuard exam management system",
+  "language": "TypeScript/React",
+  "build_system": "Next.js with npm scripts, uses Tailwind CSS for styling",
+  "test_framework": "No test framework configured - tests should be added via Jest/React Testing Library",
+  "build_command": "npm run build",
+  "test_command": "npm run lint && npm run type-check",
+  "verification_instructions": "Run npm run build to verify TypeScript compilation, npm run lint for code style, manually test error boundaries by triggering errors in development mode",
+  "snapshot_or_generated_files": "Next.js generates .next/ build directory, not checked in",
+  "environment_constraints": "Uses React 18, Next.js 14 App Router, requires browser localStorage for auth tokens",
+  "contribution_requirements": "Follow existing TypeScript patterns, use Tailwind classes, maintain accessibility standards, integrate with existing toast notification system",
+  "key_patterns": "Components in src/components/ with ui/ subdirectory for reusable UI, hooks in src/hooks/, contexts in src/contexts/, API client in src/lib/api.ts with axios interceptors, uses Zod for validation",
+  "relevant_files": [
+    "frontend/src/app/layout.tsx",
+    "frontend/src/lib/api.ts", 
+    "frontend/src/contexts/NotificationContext.tsx",
+    "frontend/src/components/ui/error-display.tsx",
+    "frontend/package.json",
+    "frontend/next.config.js"
+  ],
+  "directory_structure": "src/app/ for Next.js App Router pages, src/components/ for React components (ui/ for reusable), src/lib/ for utilities, src/contexts/ for React contexts, src/hooks/ for custom hooks"
+}
