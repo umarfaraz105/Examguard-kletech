@@ -8,7 +8,7 @@
 import * as React from 'react'
 import { Download, FileText, Users, Calendar, BarChart3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/Card'
+import { Card } from '@/components/ui/card'
 import {
   ExportButton,
   ExportDropdown,
