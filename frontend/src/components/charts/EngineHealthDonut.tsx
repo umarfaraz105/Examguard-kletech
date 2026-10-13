@@ -27,20 +27,23 @@ interface EngineHealthDonutProps {
   onRetry?: () => void;
 }
 
-export default function EngineHealthDonut({ 
+const EngineHealthDonut = React.memo(({ 
   data, 
   centerLabel,
   height = 300,
   loading = false,
   error,
   onRetry,
-}: EngineHealthDonutProps) {
-  const total = data.reduce((sum, item) => sum + item.value, 0);
-  const successRate = data.find(d => d.name === 'Success')?.value || 0;
-  const healthPercentage = total > 0 ? ((successRate / total) * 100).toFixed(1) : '0';
+}: EngineHealthDonutProps) => {
+  const total = React.useMemo(() => data.reduce((sum, item) => sum + item.value, 0), [data]);
+  const successRate = React.useMemo(() => data.find(d => d.name === 'Success')?.value || 0, [data]);
+  const healthPercentage = React.useMemo(() =>
+    total > 0 ? ((successRate / total) * 100).toFixed(1) : '0',
+    [total, successRate]
+  );
 
   // Generate accessibility data
-  const dataTableColumns = [
+  const dataTableColumns = React.useMemo(() => [
     { key: 'name', label: 'Status', format: (value: string) => value },
     { key: 'value', label: 'Count', format: (value: number) => value.toLocaleString() },
     { 
@@ -48,21 +51,27 @@ export default function EngineHealthDonut({
       label: 'Percentage', 
       format: (value: number) => `${value.toFixed(1)}%` 
     }
-  ];
+  ], []);
 
-  const tableData = data.map(item => ({
+  const tableData = React.useMemo(() => data.map(item => ({
     ...item,
     percentage: total > 0 ? (item.value / total) * 100 : 0
-  }));
+  })), [data, total]);
 
-  const chartInsights = generateChartInsights(data, 'donut', {
-    valueField: 'value',
-    labelField: 'name'
-  });
+  const chartInsights = React.useMemo(() =>
+    generateChartInsights(data, 'donut', {
+      valueField: 'value',
+      labelField: 'name'
+    }),
+    [data]
+  );
 
-  const dataDescription = `Donut chart displaying engine health status with ${total.toLocaleString()} total executions. The center shows the overall success rate of ${healthPercentage}%. Different colored segments use distinct patterns to represent success and failure rates.`;
+  const dataDescription = React.useMemo(() =>
+    `Donut chart displaying engine health status with ${total.toLocaleString()} total executions. The center shows the overall success rate of ${healthPercentage}%. Different colored segments use distinct patterns to represent success and failure rates.`,
+    [total, healthPercentage]
+  );
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = React.useCallback(({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       const percentage = ((data.value / total) * 100).toFixed(1);
@@ -80,9 +89,9 @@ export default function EngineHealthDonut({
       );
     }
     return null;
-  };
+  }, [total]);
 
-  const CenterLabel = ({ viewBox }: any) => {
+  const CenterLabel = React.useCallback(({ viewBox }: any) => {
     const { cx, cy } = viewBox;
     return (
       <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central">
@@ -104,7 +113,7 @@ export default function EngineHealthDonut({
         </tspan>
       </text>
     );
-  };
+  }, [centerLabel, healthPercentage]);
 
   return (
     <ChartWrapper
@@ -168,4 +177,8 @@ export default function EngineHealthDonut({
       </ResponsiveContainer>
     </ChartWrapper>
   );
-}
+});
+
+EngineHealthDonut.displayName = 'EngineHealthDonut';
+
+export default EngineHealthDonut;

@@ -38,7 +38,8 @@ export default function ChartWrapper({
 }: ChartWrapperProps) {
   const [showDataTable, setShowDataTable] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
-  const handleExport = () => {
+  
+  const handleExport = React.useCallback(() => {
     if (!exportable) return;
     
     try {
@@ -83,9 +84,9 @@ export default function ChartWrapper({
     } catch (err) {
       console.error('Export failed:', err);
     }
-  };
+  }, [title]);
 
-  const handleExportData = () => {
+  const handleExportData = React.useCallback(() => {
     if (!chartData.length) return;
     
     try {
@@ -113,9 +114,9 @@ export default function ChartWrapper({
     } catch (err) {
       console.error('Data export failed:', err);
     }
-  };
+  }, [chartData, title]);
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
+  const handleKeyDown = React.useCallback((event: React.KeyboardEvent) => {
     // Handle keyboard navigation for chart interactions
     const key = event.key;
     
@@ -149,10 +150,10 @@ export default function ChartWrapper({
         return;
       }
     }
-  };
+  }, [showDataTable, showDescription, handleExport, handleExportData]);
 
   // Generate comprehensive aria-label for chart container
-  const generateChartAriaLabel = () => {
+  const generateChartAriaLabel = React.useCallback(() => {
     let label = `${chartType} chart titled ${title}`;
     if (subtitle) label += `, ${subtitle}`;
     if (dataDescription) label += `. ${dataDescription}`;
@@ -167,7 +168,7 @@ export default function ChartWrapper({
     }
     
     return label;
-  };
+  }, [chartType, title, subtitle, dataDescription, chartData.length]);
 
   if (loading) {
     return (

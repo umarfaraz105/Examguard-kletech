@@ -27,18 +27,18 @@ interface ExamDistributionPieChartProps {
   onRetry?: () => void;
 }
 
-export default function ExamDistributionPieChart({ 
+const ExamDistributionPieChart = React.memo(({ 
   data, 
   height = 300,
   loading = false,
   error,
   onRetry,
-}: ExamDistributionPieChartProps) {
+}: ExamDistributionPieChartProps) => {
   // Calculate percentages
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+  const total = React.useMemo(() => data.reduce((sum, item) => sum + item.value, 0), [data]);
   
   // Generate accessibility data
-  const dataTableColumns = [
+  const dataTableColumns = React.useMemo(() => [
     { key: 'name', label: 'Category', format: (value: string) => value },
     { key: 'value', label: 'Count', format: (value: number) => value.toLocaleString() },
     { 
@@ -46,44 +46,53 @@ export default function ExamDistributionPieChart({
       label: 'Percentage', 
       format: (value: number) => `${value.toFixed(1)}%` 
     }
-  ];
+  ], []);
 
-  const tableData = data.map(item => ({
+  const tableData = React.useMemo(() => data.map(item => ({
     ...item,
     percentage: total > 0 ? (item.value / total) * 100 : 0
-  }));
+  })), [data, total]);
 
-  const chartInsights = generateChartInsights(data, 'pie', {
-    valueField: 'value',
-    labelField: 'name'
-  });
+  const chartInsights = React.useMemo(() =>
+    generateChartInsights(data, 'pie', {
+      valueField: 'value',
+      labelField: 'name'
+    }),
+    [data]
+  );
 
-  const dataDescription = `Pie chart showing the distribution of ${total.toLocaleString()} exams across ${data.length} categories. Each segment uses distinct colors and patterns, with percentages labeled for segments over 5% of the total.`;
+  const dataDescription = React.useMemo(() =>
+    `Pie chart showing the distribution of ${total.toLocaleString()} exams across ${data.length} categories. Each segment uses distinct colors and patterns, with percentages labeled for segments over 5% of the total.`,
+    [total, data.length]
+  );
 
-  const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  const CustomLabel = React.useMemo(() =>
+    ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+      const RADIAN = Math.PI / 180;
+      const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+      const x = cx + radius * Math.cos(-midAngle * RADIAN);
+      const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-    if (percent < 0.05) return null; // Don't show label for slices < 5%
+      if (percent < 0.05) return null;
 
-    return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
-        dominantBaseline="central"
-        fontSize={12}
-        fontWeight="bold"
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
-  };
+      return (
+        <text 
+          x={x} 
+          y={y} 
+          fill="white" 
+          textAnchor={x > cx ? 'start' : 'end'} 
+          dominantBaseline="central"
+          fontSize={12}
+          fontWeight="bold"
+        >
+          {`${(percent * 100).toFixed(0)}%`}
+        </text>
+      );
+    },
+    []
+  );
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = React.useCallback(({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       const percentage = ((data.value / total) * 100).toFixed(1);
@@ -101,7 +110,7 @@ export default function ExamDistributionPieChart({
       );
     }
     return null;
-  };
+  }, [total]);
 
   return (
     <ChartWrapper
@@ -160,4 +169,8 @@ export default function ExamDistributionPieChart({
       </ResponsiveContainer>
     </ChartWrapper>
   );
-}
+});
+
+ExamDistributionPieChart.displayName = 'ExamDistributionPieChart';
+
+export default ExamDistributionPieChart;

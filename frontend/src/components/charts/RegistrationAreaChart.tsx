@@ -30,28 +30,42 @@ interface RegistrationAreaChartProps {
   onRetry?: () => void;
 }
 
-export default function RegistrationAreaChart({ 
+const RegistrationAreaChart = React.memo(({ 
   data, 
   height = 300,
   loading = false,
   error,
   onRetry,
-}: RegistrationAreaChartProps) {
+}: RegistrationAreaChartProps) => {
+  // Sample data if too large (performance optimization)
+  const sampledData = React.useMemo(() => {
+    if (data.length <= 500) return data;
+    
+    const step = Math.ceil(data.length / 500);
+    return data.filter((_, index) => index % step === 0);
+  }, [data]);
+
   // Generate accessibility data
-  const dataTableColumns = [
+  const dataTableColumns = React.useMemo(() => [
     { key: 'month', label: 'Month', format: (value: string) => value },
     { key: 'registered', label: 'Total Registered', format: (value: number) => value.toLocaleString() },
     { key: 'completed', label: 'Completed', format: (value: number) => value.toLocaleString() },
     { key: 'pending', label: 'Pending', format: (value: number) => value.toLocaleString() }
-  ];
+  ], []);
 
-  const chartInsights = generateChartInsights(data, 'area', {
-    valueField: 'registered',
-    labelField: 'month',
-    timeField: 'month'
-  });
+  const chartInsights = React.useMemo(() =>
+    generateChartInsights(data, 'area', {
+      valueField: 'registered',
+      labelField: 'month',
+      timeField: 'month'
+    }),
+    [data]
+  );
 
-  const dataDescription = `Stacked area chart showing registration trends over ${data.length} time periods. Blue area represents total registrations, green shows completed registrations, and yellow indicates pending registrations. Areas are stacked and use different fill patterns to distinguish categories.`;
+  const dataDescription = React.useMemo(() =>
+    `Stacked area chart showing registration trends over ${data.length} time periods. Blue area represents total registrations, green shows completed registrations, and yellow indicates pending registrations. Areas are stacked and use different fill patterns to distinguish categories.${data.length > 500 ? ` Chart displays a sample of ~${sampledData.length} points for performance.` : ''}`,
+    [data.length, sampledData.length]
+  );
 
   return (
     <ChartWrapper
@@ -76,7 +90,7 @@ export default function RegistrationAreaChart({
     >
       <ResponsiveContainer width="100%" height={height}>
         <AreaChart 
-          data={data} 
+          data={sampledData} 
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           role="img"
           aria-label="Stacked area chart showing registration trends over time"
@@ -161,4 +175,8 @@ export default function RegistrationAreaChart({
       </ResponsiveContainer>
     </ChartWrapper>
   );
-}
+});
+
+RegistrationAreaChart.displayName = 'RegistrationAreaChart';
+
+export default RegistrationAreaChart;

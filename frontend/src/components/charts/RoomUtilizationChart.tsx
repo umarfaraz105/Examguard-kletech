@@ -30,15 +30,24 @@ interface RoomUtilizationChartProps {
   onRetry?: () => void;
 }
 
-export default function RoomUtilizationChart({ 
+const RoomUtilizationChart = React.memo(({ 
   data, 
   height = 300,
   loading = false,
   error,
   onRetry,
-}: RoomUtilizationChartProps) {
+}: RoomUtilizationChartProps) => {
+  // Sample data if too large (performance optimization)
+  const sampledData = React.useMemo(() => {
+    if (data.length <= 500) return data;
+    
+    // Simple sampling: take every Nth point
+    const step = Math.ceil(data.length / 500);
+    return data.filter((_, index) => index % step === 0);
+  }, [data]);
+
   // Generate accessibility data
-  const dataTableColumns = [
+  const dataTableColumns = React.useMemo(() => [
     { key: 'room', label: 'Room', format: (value: string) => value },
     { key: 'capacity', label: 'Capacity', format: (value: number) => value.toLocaleString() },
     { key: 'utilization', label: 'Utilized', format: (value: number) => value.toLocaleString() },
@@ -47,42 +56,54 @@ export default function RoomUtilizationChart({
       label: 'Utilization Rate (%)', 
       format: (value: number) => `${value.toFixed(1)}%` 
     }
-  ];
+  ], []);
 
-  const tableData = data.map(item => ({
-    ...item,
-    utilizationRate: (item.utilization / item.capacity) * 100
-  }));
+  const tableData = React.useMemo(() => 
+    data.map(item => ({
+      ...item,
+      utilizationRate: (item.utilization / item.capacity) * 100
+    })),
+    [data]
+  );
 
-  const chartInsights = generateChartInsights(tableData, 'bar', {
-    valueField: 'utilization',
-    labelField: 'room'
-  });
+  const chartInsights = React.useMemo(() => 
+    generateChartInsights(tableData, 'bar', {
+      valueField: 'utilization',
+      labelField: 'room'
+    }),
+    [tableData]
+  );
 
-  const dataDescription = `Room utilization chart showing capacity versus actual usage across ${data.length} rooms. Each bar represents room capacity with color-coded utilization rates: green for under 75%, yellow for 75-90%, and red for over 90%.`;
+  const dataDescription = React.useMemo(() => 
+    `Room utilization chart showing capacity versus actual usage across ${data.length} rooms. Each bar represents room capacity with color-coded utilization rates: green for under 75%, yellow for 75-90%, and red for over 90%.${data.length > 500 ? ` Chart displays a sample of ~${sampledData.length} rooms for performance.` : ''}`,
+    [data.length, sampledData.length]
+  );
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const room = payload[0].payload;
-      const utilizationRate = ((room.utilization / room.capacity) * 100).toFixed(1);
-      
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">{label}</p>
-          <p className="text-sm text-gray-600">
-            Capacity: <span className="font-medium">{room.capacity}</span>
-          </p>
-          <p className="text-sm text-gray-600">
-            Utilized: <span className="font-medium">{room.utilization}</span>
-          </p>
-          <p className="text-sm text-gray-600">
-            Rate: <span className="font-medium text-primary">{utilizationRate}%</span>
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
+  const CustomTooltip = React.useMemo(() => 
+    ({ active, payload, label }: any) => {
+      if (active && payload && payload.length) {
+        const room = payload[0].payload;
+        const utilizationRate = ((room.utilization / room.capacity) * 100).toFixed(1);
+        
+        return (
+          <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+            <p className="font-medium text-gray-900">{label}</p>
+            <p className="text-sm text-gray-600">
+              Capacity: <span className="font-medium">{room.capacity}</span>
+            </p>
+            <p className="text-sm text-gray-600">
+              Utilized: <span className="font-medium">{room.utilization}</span>
+            </p>
+            <p className="text-sm text-gray-600">
+              Rate: <span className="font-medium text-primary">{utilizationRate}%</span>
+            </p>
+          </div>
+        );
+      }
+      return null;
+    },
+    []
+  );
 
   return (
     <ChartWrapper
@@ -107,7 +128,7 @@ export default function RoomUtilizationChart({
     >
       <ResponsiveContainer width="100%" height={height}>
         <BarChart 
-          data={data} 
+          data={sampledData} 
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           role="img"
           aria-label="Bar chart showing room utilization data"
@@ -140,7 +161,7 @@ export default function RoomUtilizationChart({
             radius={[2, 2, 0, 0]}
             aria-label="Current utilization"
           >
-            {data.map((entry, index) => {
+            {sampledData.map((entry, index) => {
               const rate = (entry.utilization / entry.capacity) * 100;
               let color: string = CHART_COLORS.success;
               if (rate > 90) color = CHART_COLORS.primary;
@@ -159,4 +180,8 @@ export default function RoomUtilizationChart({
       </ResponsiveContainer>
     </ChartWrapper>
   );
-}
+});
+
+RoomUtilizationChart.displayName = 'RoomUtilizationChart';
+
+export default RoomUtilizationChart;

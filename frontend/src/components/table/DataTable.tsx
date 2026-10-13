@@ -37,6 +37,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useTableData, TableColumn, FilterValue } from '@/lib/hooks/useTableData';
 import { TableSkeleton } from '@/components/loading/LoadingSkeletons';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export interface DataTableProps<T> {
   data: T[];
@@ -88,6 +89,8 @@ export const DataTable = <T extends Record<string, any>>({
 }: DataTableProps<T>) => {
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebounce(searchInput, 300);
 
   const {
     data: paginatedData,
@@ -114,7 +117,12 @@ export const DataTable = <T extends Record<string, any>>({
     enableGlobalSearch
   });
 
-  const handleRowSelect = (index: number, checked: boolean) => {
+  // Update table data when debounced search changes
+  React.useEffect(() => {
+    handleGlobalSearch(debouncedSearch);
+  }, [debouncedSearch, handleGlobalSearch]);
+
+  const handleRowSelect = React.useCallback((index: number, checked: boolean) => {
     const newSelected = new Set(selectedRows);
     if (checked) {
       newSelected.add(index);
@@ -127,9 +135,9 @@ export const DataTable = <T extends Record<string, any>>({
       const selectedData = Array.from(newSelected).map(i => paginatedData[i]);
       onSelectionChange(selectedData);
     }
-  };
+  }, [selectedRows, paginatedData, onSelectionChange]);
 
-  const handleSelectAll = (checked: boolean) => {
+  const handleSelectAll = React.useCallback((checked: boolean) => {
     if (checked) {
       const allIndices = paginatedData.map((_, i) => i);
       setSelectedRows(new Set(allIndices));
@@ -138,9 +146,9 @@ export const DataTable = <T extends Record<string, any>>({
       setSelectedRows(new Set());
       onSelectionChange?.([]);
     }
-  };
+  }, [paginatedData, onSelectionChange]);
 
-  const renderCell = (column: TableColumn, value: any, row: T) => {
+  const renderCell = React.useCallback((column: TableColumn, value: any, row: T) => {
     if (column.render) {
       return column.render(value, row);
     }
@@ -162,9 +170,9 @@ export const DataTable = <T extends Record<string, any>>({
     }
     
     return String(value);
-  };
+  }, []);
 
-  const getSortIcon = (columnKey: string) => {
+  const getSortIcon = React.useCallback((columnKey: string) => {
     if (!sortConfig || sortConfig.key !== columnKey) {
       return null;
     }
@@ -174,9 +182,9 @@ export const DataTable = <T extends Record<string, any>>({
     ) : (
       <SortDesc className="h-4 w-4" />
     );
-  };
+  }, [sortConfig]);
 
-  const renderPagination = () => {
+  const renderPagination = React.useCallback(() => {
     if (!enablePagination) return null;
 
     const { page, totalPages, totalItems } = pagination;
@@ -260,7 +268,7 @@ export const DataTable = <T extends Record<string, any>>({
         </nav>
       </div>
     );
-  };
+  }, [enablePagination, pagination, pageSize, handlePageChange, handlePageSizeChange]);
 
   if (loading) {
     return (
@@ -290,8 +298,8 @@ export const DataTable = <T extends Record<string, any>>({
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
                     placeholder={searchPlaceholder}
-                    value={globalSearch}
-                    onChange={(e) => handleGlobalSearch(e.target.value)}
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
                     className="pl-10"
                   />
                 </div>

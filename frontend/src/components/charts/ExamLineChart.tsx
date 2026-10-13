@@ -30,28 +30,43 @@ interface ExamLineChartProps {
   onRetry?: () => void;
 }
 
-export default function ExamLineChart({ 
+const ExamLineChart = React.memo(({ 
   data, 
   height = 300,
   loading = false,
   error,
   onRetry,
-}: ExamLineChartProps) {
+}: ExamLineChartProps) => {
+  // Sample data if too large (performance optimization)
+  const sampledData = React.useMemo(() => {
+    if (data.length <= 500) return data;
+    
+    // Simple sampling: take every Nth point
+    const step = Math.ceil(data.length / 500);
+    return data.filter((_, index) => index % step === 0);
+  }, [data]);
+
   // Generate accessibility data
-  const dataTableColumns = [
+  const dataTableColumns = React.useMemo(() => [
     { key: 'month', label: 'Month', format: (value: string) => value },
     { key: 'scheduled', label: 'Scheduled', format: (value: number) => value.toLocaleString() },
     { key: 'completed', label: 'Completed', format: (value: number) => value.toLocaleString() },
     { key: 'ongoing', label: 'Ongoing', format: (value: number) => value.toLocaleString() }
-  ];
+  ], []);
 
-  const chartInsights = generateChartInsights(data, 'line', {
-    valueField: 'scheduled',
-    labelField: 'month',
-    timeField: 'month'
-  });
+  const chartInsights = React.useMemo(() => 
+    generateChartInsights(data, 'line', {
+      valueField: 'scheduled',
+      labelField: 'month',
+      timeField: 'month'
+    }),
+    [data]
+  );
 
-  const dataDescription = `Line chart showing exam statistics over ${data.length} time periods. Tracks scheduled exams (blue line), completed exams (green line), and ongoing exams (light blue line). Lines use both color and different patterns to distinguish data series.`;
+  const dataDescription = React.useMemo(() => 
+    `Line chart showing exam statistics over ${data.length} time periods. Tracks scheduled exams (blue line), completed exams (green line), and ongoing exams (light blue line). Lines use both color and different patterns to distinguish data series.${data.length > 500 ? ` Chart displays a sample of ~${sampledData.length} points for performance.` : ''}`,
+    [data.length, sampledData.length]
+  );
 
   return (
     <ChartWrapper
@@ -76,7 +91,7 @@ export default function ExamLineChart({
     >
       <ResponsiveContainer width="100%" height={height}>
         <LineChart 
-          data={data} 
+          data={sampledData} 
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           role="img"
           aria-label="Line chart showing exam statistics trends over time"
@@ -138,4 +153,8 @@ export default function ExamLineChart({
       </ResponsiveContainer>
     </ChartWrapper>
   );
-}
+});
+
+ExamLineChart.displayName = 'ExamLineChart';
+
+export default ExamLineChart;

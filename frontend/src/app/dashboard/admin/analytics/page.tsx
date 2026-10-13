@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Calendar,
@@ -12,11 +13,8 @@ import {
 import {
   DateRangePicker,
   MetricCard,
-  ExamLineChart,
-  RoomUtilizationChart,
-  EngineHealthDonut,
-  ExamDistributionPieChart,
 } from '@/components/charts';
+import { ChartSkeleton } from '@/components/loading/LoadingSkeletons';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import {
   generateExamStatsOverTime,
@@ -27,6 +25,27 @@ import {
   calculateTrend,
 } from '@/lib/analytics';
 import { addMonths } from 'date-fns';
+
+// Lazy load chart components
+const ExamLineChart = dynamic(() => import('@/components/charts/ExamLineChart'), {
+  loading: () => <ChartSkeleton type="line" loadingText="Loading exam statistics chart" />,
+  ssr: false
+});
+
+const RoomUtilizationChart = dynamic(() => import('@/components/charts/RoomUtilizationChart'), {
+  loading: () => <ChartSkeleton type="bar" loadingText="Loading room utilization chart" />,
+  ssr: false
+});
+
+const EngineHealthDonut = dynamic(() => import('@/components/charts/EngineHealthDonut'), {
+  loading: () => <ChartSkeleton type="pie" loadingText="Loading engine health chart" />,
+  ssr: false
+});
+
+const ExamDistributionPieChart = dynamic(() => import('@/components/charts/ExamDistributionPieChart'), {
+  loading: () => <ChartSkeleton type="pie" loadingText="Loading exam distribution chart" />,
+  ssr: false
+});
 
 interface DashboardStats {
   total_exams?: number;
