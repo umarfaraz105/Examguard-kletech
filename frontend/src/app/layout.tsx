@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { HelpProvider } from "@/components/help/HelpSystem";
 import AppLayout from "@/components/layout/AppLayout";
+import GlobalErrorBoundary from "@/components/errors/GlobalErrorBoundary";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,15 +22,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          <NotificationProvider>
-            <HelpProvider>
-              <AppLayout>
-                {children}
-              </AppLayout>
-            </HelpProvider>
-          </NotificationProvider>
-        </AuthProvider>
+        <GlobalErrorBoundary>
+          <AuthProvider>
+            <NotificationProvider>
+              <HelpProvider>
+                <AppLayout>
+                  {children}
+                </AppLayout>
+              </HelpProvider>
+            </NotificationProvider>
+          </AuthProvider>
+        </GlobalErrorBoundary>
       </body>
     </html>
   );
