@@ -71,49 +71,55 @@ const EngineHealthDonut = React.memo(({
     [total, healthPercentage]
   );
 
-  const CustomTooltip = React.useCallback(({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      const percentage = ((data.value / total) * 100).toFixed(1);
-      
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">{data.name}</p>
-          <p className="text-sm text-gray-600">
-            Count: <span className="font-medium">{data.value}</span>
-          </p>
-          <p className="text-sm text-gray-600">
-            Percentage: <span className="font-medium text-primary">{percentage}%</span>
-          </p>
-        </div>
-      );
-    }
-    return null;
-  }, [total]);
+  const CustomTooltip = React.useMemo(() =>
+    ({ active, payload }: any) => {
+      if (active && payload && payload.length) {
+        const data = payload[0].payload;
+        const percentage = ((data.value / total) * 100).toFixed(1);
+        
+        return (
+          <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+            <p className="font-medium text-gray-900">{data.name}</p>
+            <p className="text-sm text-gray-600">
+              Count: <span className="font-medium">{data.value}</span>
+            </p>
+            <p className="text-sm text-gray-600">
+              Percentage: <span className="font-medium text-primary">{percentage}%</span>
+            </p>
+          </div>
+        );
+      }
+      return null;
+    },
+    [total]
+  );
 
-  const CenterLabel = React.useCallback(({ viewBox }: any) => {
-    const { cx, cy } = viewBox;
-    return (
-      <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central">
-        <tspan 
-          x={cx} 
-          y={cy - 10} 
-          className="text-2xl font-bold" 
-          fill={CHART_COLORS.primary}
-        >
-          {centerLabel || `${healthPercentage}%`}
-        </tspan>
-        <tspan 
-          x={cx} 
-          y={cy + 15} 
-          className="text-sm" 
-          fill="#6b7280"
-        >
-          {centerLabel ? 'Total' : 'Success Rate'}
-        </tspan>
-      </text>
-    );
-  }, [centerLabel, healthPercentage]);
+  const CenterLabel = React.useMemo(() => 
+    ({ viewBox }: any) => {
+      const { cx, cy } = viewBox;
+      return (
+        <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central">
+          <tspan 
+            x={cx} 
+            y={cy - 10} 
+            className="text-2xl font-bold" 
+            fill={CHART_COLORS.primary}
+          >
+            {centerLabel || `${healthPercentage}%`}
+          </tspan>
+          <tspan 
+            x={cx} 
+            y={cy + 15} 
+            className="text-sm" 
+            fill="#6b7280"
+          >
+            {centerLabel ? 'Total' : 'Success Rate'}
+          </tspan>
+        </text>
+      );
+    },
+    [centerLabel, healthPercentage]
+  );
 
   return (
     <ChartWrapper

@@ -92,25 +92,28 @@ const ExamDistributionPieChart = React.memo(({
     []
   );
 
-  const CustomTooltip = React.useCallback(({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      const percentage = ((data.value / total) * 100).toFixed(1);
-      
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">{data.name}</p>
-          <p className="text-sm text-gray-600">
-            Count: <span className="font-medium">{data.value}</span>
-          </p>
-          <p className="text-sm text-gray-600">
-            Percentage: <span className="font-medium text-primary">{percentage}%</span>
-          </p>
-        </div>
-      );
-    }
-    return null;
-  }, [total]);
+  const CustomTooltip = React.useMemo(() =>
+    ({ active, payload }: any) => {
+      if (active && payload && payload.length) {
+        const data = payload[0].payload;
+        const percentage = ((data.value / total) * 100).toFixed(1);
+        
+        return (
+          <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+            <p className="font-medium text-gray-900">{data.name}</p>
+            <p className="text-sm text-gray-600">
+              Count: <span className="font-medium">{data.value}</span>
+            </p>
+            <p className="text-sm text-gray-600">
+              Percentage: <span className="font-medium text-primary">{percentage}%</span>
+            </p>
+          </div>
+        );
+      }
+      return null;
+    },
+    [total]
+  );
 
   return (
     <ChartWrapper
