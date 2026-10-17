@@ -1,4 +1,21 @@
 /**
+ * IMPORTANT — BACKEND COORDINATION REQUIRED
+ *
+ * This module provides a frontend CSRF token layer only.
+ * The X-CSRF-Token header this sends has NO security value unless the backend
+ * independently validates it against a server-issued or cookie-bound token.
+ *
+ * TODO (backend): Implement one of:
+ *   a) SameSite=Strict cookies for session management (simplest, recommended)
+ *   b) Backend-issued CSRF tokens: server sets token on login, validates on
+ *      every state-changing request (POST/PUT/PATCH/DELETE)
+ *   c) Double-submit cookie pattern: HttpOnly cookie + matching request header
+ *
+ * Until the backend validates this token, this layer is a UX convenience, not
+ * a security control.
+ */
+
+/**
  * CSRF (Cross-Site Request Forgery) protection utilities.
  *
  * Strategy: double-submit cookie pattern.

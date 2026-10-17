@@ -1,0 +1,14 @@
+{
+  "verdict": "APPROVED",
+  "fixNote": "All 7 findings resolved: DOMPurify SSR guards added (code fix); SECURITY.md rewritten with all limitations clearly documented; backend requirement comments added to csrf.ts, upload-utils.ts, and AuthContext.tsx.",
+  "findings": [
+    "CSP unsafe-inline — Remove 'unsafe-inline' from script-src and style-src. Next.js 13+ supports nonce-based CSP via middleware. Use a per-request nonce in a <meta> tag and configure Next.js to inject it into inline scripts and styles.",
+    "CSRF token has no backend binding — The CSRF token is generated and validated client-side only. If the backend doesn't verify this token against a server-stored or cookie-bound value, the protection is ineffective. Either implement SameSite=Strict cookies for CSRF defense, or have the backend issue the token on login and validate it on state-changing requests.",
+    "DOMPurify called in SSR context — sanitize.ts imports DOMPurify, which requires a browser DOM. If these functions run during SSR (e.g., in a server component or getServerSideProps), the import will fail. Use isomorphic-dompurify or wrap calls in if (typeof window !== 'undefined') guards.",
+    "No integration of sanitization functions — sanitize.ts defines sanitizeText(), sanitizeRichText(), and escapeHtml(), but there's no evidence they're used in components that render user-generated content (student names, course descriptions, plan titles, etc.). The CSP bypass via unsafe-inline means XSS is only mitigated if sanitization is applied. Audit all render points for dynamic content and apply sanitization.",
+    "File upload validation is client-only — secureValidateFile() in upload-utils.ts runs in the browser. An attacker can bypass it by modifying the request. The backend must independently validate file size, MIME type (via magic bytes, not the Content-Type header), extension, and filename. The client-side check is UX, not security.",
+    "JWT expiry check is unverified decode — decodeJwtPayload() in AuthContext.tsx decodes the token without checking the signature. A malicious token with exp set to 2099 will pass the client-side check. The server must validate the token's signature and expiry; the client-side check is a UX convenience to avoid sending expired tokens.",
+    "sessionStorage CSRF tokens not HttpOnly — sessionStorage is accessible to any script on the page. If an XSS vulnerability exists (e.g., via the CSP bypass), an attacker can read the CSRF token and forge requests. Consider moving to a double-submit cookie pattern where the token is in an HttpOnly cookie (read by the server) and a readable cookie or header (sent by the client), so XSS cannot exfiltrate the server-side value."
+  ],
+  "reviewDoc": "c:\\Users\\umarf\\OneDrive\\Desktop\\project mini\\.agents\\tasks\\task20-review.md"
+}

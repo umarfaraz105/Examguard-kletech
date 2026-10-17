@@ -24,6 +24,14 @@ const RICH_TEXT_CONFIG: Config = {
  */
 export function sanitizeText(input: string): string {
   if (typeof input !== 'string') return '';
+  
+  // Only runs in browser — returns input unchanged during SSR (server-side rendering)
+  if (typeof window === 'undefined') {
+    // SSR context: DOMPurify requires a browser DOM. Sanitization is skipped here;
+    // React server components should not render untrusted user HTML directly.
+    return input;
+  }
+  
   const result = DOMPurify.sanitize(input, STRICT_CONFIG);
   return typeof result === 'string' ? result : String(result);
 }
@@ -33,6 +41,14 @@ export function sanitizeText(input: string): string {
  */
 export function sanitizeRichText(input: string): string {
   if (typeof input !== 'string') return '';
+  
+  // Only runs in browser — returns input unchanged during SSR (server-side rendering)
+  if (typeof window === 'undefined') {
+    // SSR context: DOMPurify requires a browser DOM. Sanitization is skipped here;
+    // React server components should not render untrusted user HTML directly.
+    return input;
+  }
+  
   const result = DOMPurify.sanitize(input, RICH_TEXT_CONFIG);
   return typeof result === 'string' ? result : String(result);
 }

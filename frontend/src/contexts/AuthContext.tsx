@@ -23,6 +23,17 @@ interface AuthContextType {
 }
 
 /**
+ * UX CONVENIENCE — not a security control.
+ *
+ * This decodes the JWT payload WITHOUT verifying the signature.
+ * A malicious token with a forged exp claim will pass this check.
+ *
+ * The server MUST validate the token's signature and expiry on every
+ * authenticated request. Client-side expiry checking exists only to avoid
+ * sending obviously expired tokens and to log out inactive users promptly.
+ */
+
+/**
  * Decodes a JWT payload without verifying the signature.
  * Returns null if the token is malformed.
  */

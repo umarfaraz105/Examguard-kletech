@@ -297,6 +297,21 @@ export const SECURE_FILE_LIMITS = {
 } as const;
 
 /**
+ * CLIENT-SIDE VALIDATION ONLY — UX guardrail, not a security gate.
+ *
+ * This function validates files in the browser. An attacker can bypass it
+ * by sending a raw HTTP request. The backend MUST independently validate:
+ *   - File size (read Content-Length or stream body length; reject > 5 MB)
+ *   - MIME type via magic bytes (do NOT trust the Content-Type header)
+ *   - File extension whitelist
+ *   - Filename safety (path traversal, null bytes, Unicode homoglyphs)
+ *   - Content inspection (decode images to verify they are valid images)
+ *
+ * This check improves UX by catching obvious mistakes early.
+ * It is NOT a substitute for server-side validation.
+ */
+
+/**
  * Validates a file against strict security limits.
  * Checks: size, MIME type whitelist, extension whitelist, and filename safety.
  * Returns an error message string on failure, or null on success.
