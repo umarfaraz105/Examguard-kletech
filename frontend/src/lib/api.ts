@@ -16,12 +16,23 @@ export const api = axios.create({
   timeout: 30000, // 30 second timeout
 });
 
-// Request interceptor to include JWT token
+// Request interceptor to include JWT token and CSRF token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    // Add CSRF token to state-changing requests
+    const method = config.method?.toLowerCase();
+    if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
+      try {
+        const { getCsrfHeaders } = require('@/lib/security/csrf');
+        const csrfHeaders = getCsrfHeaders();
+        Object.assign(config.headers, csrfHeaders);
+      } catch {
+        // Security module unavailable - continue without CSRF header
+      }
     }
     return config;
   },
