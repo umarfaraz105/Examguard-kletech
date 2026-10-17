@@ -216,53 +216,140 @@ examguard/
 5. **Audit Trail**: Every change recorded in audit log
 6. **Test Coverage**: Unit tests for every module
 
+## System Requirements
+
+### Production
+- **Operating System**: Linux (Ubuntu 20.04+), Windows Server 2019+, macOS 11+
+- **Memory**: 8GB RAM minimum (16GB recommended for production)
+- **Storage**: 50GB available space (SSD recommended)
+- **Processor**: 4+ CPU cores
+
+### Development
+- **Docker**: Version 20.10+
+- **Docker Compose**: Version 2.0+
+- **Node.js**: Version 18.x or higher
+- **Python**: Version 3.11+
+- **PostgreSQL**: Version 14+ (managed via Docker)
+
 ## Quick Start
 
 ### Prerequisites
-- Docker & Docker Compose
+- Docker & Docker Compose installed and running
 - Node.js 18+ (for local frontend development)
 - Python 3.11+ (for local backend development)
+- Git for version control
 
 ### Using Docker (Recommended)
 
 ```bash
+# Clone the repository
+git clone <repository-url>
+cd examguard
+
 # Start all services
 docker-compose up -d
 
+# Verify services are running
+docker-compose ps
+
+# Initialize database (first time only)
+docker-compose exec backend alembic upgrade head
+
+# Access the system
 # Backend API: http://localhost:8000
 # Frontend: http://localhost:3000
 # API Docs: http://localhost:8000/docs
+
+# Default login credentials
+# Email: admin@kletu.ac.in
+# Password: admin123
 ```
+
+**Common Startup Issues**: If services fail to start, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ### Local Development
 
-#### Backend
+#### Backend Setup
 ```bash
 cd backend
+
+# Create virtual environment
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
+
+# Run database migrations
 alembic upgrade head
+
+# Start development server
 uvicorn app.main:app --reload
+
+# Backend will be available at http://localhost:8000
 ```
 
-#### Frontend
+#### Frontend Setup
 ```bash
 cd frontend
+
+# Install dependencies
 npm install
+
+# Set up environment variables
+cp .env.local.example .env.local
+# Edit .env.local with backend API URL
+
+# Start development server
 npm run dev
+
+# Frontend will be available at http://localhost:3000
 ```
 
 ## Running Tests
 
+### Backend Tests
 ```bash
-# Backend tests
 cd backend
+
+# Activate virtual environment
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Run all tests
 pytest
 
-# Frontend tests
+# Run with coverage
+pytest --cov=app --cov-report=html
+
+# Run specific test file
+pytest tests/test_engine1.py
+
+# Run with verbose output
+pytest -v
+```
+
+### Frontend Tests
+```bash
 cd frontend
+
+# Run unit tests
 npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run with coverage
+npm run test:coverage
+
+# Run end-to-end tests
+npm run test:e2e
+
+# Run integration tests
+npm run test:integration
 ```
 
 ## API Documentation
@@ -273,21 +360,101 @@ Once running, visit:
 
 ## Environment Variables
 
-Create `.env` files in backend and frontend directories:
+### Backend Environment (`.env`)
+Create `backend/.env` based on `.env.example`:
 
-### Backend `.env`
-```
+```env
+# Database Configuration
 DATABASE_URL=postgresql://examguard:examguard@localhost:5432/examguard
-SECRET_KEY=your-secret-key-here
+
+# Security
+SECRET_KEY=your-secret-key-here-change-in-production
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# CORS
+ALLOWED_ORIGINS=["http://localhost:3000"]
+
+# Environment
+ENVIRONMENT=development
+DEBUG=true
 ```
 
-### Frontend `.env.local`
-```
+### Frontend Environment (`.env.local`)
+Create `frontend/.env.local` based on `.env.local.example`:
+
+```env
+# API Configuration
 NEXT_PUBLIC_API_URL=http://localhost:8000
+
+# Environment
+NODE_ENV=development
 ```
+
+## 📚 Documentation
+
+Complete documentation is available in the [`docs/`](docs/) directory:
+
+### Core Documentation
+- **[Architecture Guide](docs/ARCHITECTURE.md)** - System design, plugin architecture, technical overview
+- **[API Reference](docs/API.md)** - Complete REST API documentation with examples
+- **[User Guide](docs/USER_GUIDE.md)** - Role-based usage instructions
+- **[Engine Specifications](docs/ENGINES.md)** - Detailed algorithms for all four engines
+
+### Quick Reference
+- **[Quick Start](docs/QUICK_START.md)** - Get running in 5 minutes
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[FAQ](docs/FAQ.md)** - Frequently asked questions
+- **[Database Schema](docs/DATABASE.md)** - Data model and relationships
+
+### For Developers
+- **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to ExamGuard
+- **[Development Guide](docs/DEVELOPMENT.md)** - Development environment and patterns
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Production deployment instructions
+
+### For Administrators
+- **[Operations Guide](docs/OPERATIONS.md)** - Production operations and maintenance
+- **[Security Guide](docs/SECURITY.md)** - Security features and best practices
+
+## 🤝 Contributing
+
+We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) for:
+- Development environment setup
+- Coding standards and conventions
+- Testing requirements
+- Git workflow and PR process
+- Adding new plugin engines
+
+## 🔒 Security
+
+### Production Deployment Checklist
+Before deploying to production, review:
+- [ ] Change default SECRET_KEY in backend `.env`
+- [ ] Use strong passwords for admin accounts
+- [ ] Configure proper CORS origins
+- [ ] Enable HTTPS/TLS certificates
+- [ ] Set up database backups
+- [ ] Configure CSP headers
+- [ ] Review [Security Guide](docs/SECURITY.md)
+
+For security issues, please see our security policy in the documentation.
 
 ## License
 
-Proprietary - KLE Technological University
+**Proprietary License** - KLE Technological University
+
+This software is proprietary and confidential. Unauthorized copying, distribution, or use of this software, via any medium, is strictly prohibited without explicit written permission from KLE Technological University.
+
+## Support and Contact
+
+For questions, issues, or contributions:
+- **Documentation**: Check the [docs/](docs/) directory first
+- **Issues**: Report bugs via GitHub Issues
+- **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines
+- **Troubleshooting**: See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues
+
+---
+
+**Version**: 2.0.0 (Plugin Architecture)  
+**Last Updated**: January 2025  
+**Maintained By**: ExamGuard Development Team, KLE Technological University

@@ -12,6 +12,7 @@ Welcome to the complete documentation for ExamGuard - Intelligent Multi-Engine E
 | **[User Guide](USER_GUIDE.md)** | Complete usage instructions for all user roles | End Users, Administrators |
 | **[Deployment Guide](DEPLOYMENT.md)** | Production setup and maintenance | DevOps, System Administrators |
 | **[API Reference](API.md)** | REST API documentation with examples | Developers, Integrators |
+| **[Contributing Guidelines](../CONTRIBUTING.md)** | How to contribute to ExamGuard development | Developers, Contributors |
 
 ### Quick Reference
 
@@ -19,6 +20,7 @@ Welcome to the complete documentation for ExamGuard - Intelligent Multi-Engine E
 |----------|-------------|----------|
 | **[Quick Start](QUICK_START.md)** | Get up and running in 5 minutes | Everyone |
 | **[Troubleshooting](TROUBLESHOOTING.md)** | Common issues and solutions | Support, Users |
+| **[Troubleshooting Guide](../TROUBLESHOOTING.md)** | Quick troubleshooting reference (root) | Everyone |
 | **[FAQ](FAQ.md)** | Frequently asked questions | Everyone |
 
 ### Technical Documentation
@@ -101,6 +103,6 @@ For documentation-related questions:
 
 ---
 
-**Last Updated**: [Current Date]  
-**Version**: 1.0.0  
+**Last Updated**: January 2025  
+**Version**: 2.0.0  
 **Maintained By**: ExamGuard Development Team
